@@ -1,9 +1,12 @@
 #include "main.hpp"
+
 #include <iostream>
 #include <cstdlib>
-#include "tests.hpp"
+#include <algorithm>
+#include <cctype>
 
-#include "stringhelper.hpp"
+#include "tests.hpp"
+#include "testframework.hpp"
 
 
 int main(int argc, char *argv[])
@@ -15,27 +18,21 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
     std::string testname(argv[1]);
+    std::transform(testname.begin(), testname.end(), testname.begin(), ::tolower);
+    
     if (testname == "basename")
         return tests::testBasename();
     else if (testname == "endswith")
         return tests::testEndsWith();
+    else if (testname == "soundfile")
+        return tests::testSoundFile();
     else
     {
         std::cout << "test \"" << testname << "\" is unknown." << std::endl;
         return EXIT_FAILURE;
     }
-	return 0;
+    
+	return EXIT_SUCCESS;
 }
 
-namespace tests
-{
-    int testEndsWith()
-    {
-        CHECK(endsWith("hello world", "world"));
-        CHECK(!endsWith("hello world!", "world"));
-        CHECK(endsWith("lalalala", "lala"));
-        CHECK(endsWith("lalalala", "la"));
-        CHECK(endsWith("lalalala", "lalalala"));
-        CHECK(!endsWith("lala", "lalalala"));
-    }
-}
+

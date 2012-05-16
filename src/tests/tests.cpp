@@ -1,37 +1,40 @@
 #include "tests.hpp"
+#include "testframework.hpp"
+#include <cstdlib>
 
 
-
-/**
- * @file
- * @ingroup tests
- * @attention do not use these testing functions from within the program for other
- * purposes than testinh, as they are able to change the state of the program in
- * a non-polite manner!
- */
-
-using namespace std;
+#include "stringhelper.hpp"
+#include "soundfile.hpp"
 
 namespace tests
 {
-    std::string basename(std::string filename)
+    int testEndsWith()
     {
-        size_t pos = filename.find_last_of("/\\:");
-        pos = (pos!=std::string::npos) ? pos+1 : 0;
-        return filename.substr(pos, filename.length() - pos - (filename.find_last_of("\"") != std::string::npos));
+        CHECK(endsWith("hello world", "world"));
+        CHECK(!endsWith("hello world!", "world"));
+        CHECK(endsWith("lalalala", "lala"));
+        CHECK(endsWith("lalalala", "la"));
+        CHECK(endsWith("lalalala", "lalalala"));
+        CHECK(!endsWith("lala", "lalalala"));
+        
+        return EXIT_SUCCESS;
     }
     
-    int testBasename()
+    int testSoundFile()
     {
-        CHECK_EQ_TYPE(tests::basename("test.cpp"), "test.cpp", std::string);
-        CHECK_EQ_TYPE(tests::basename("/test.cpp"), "test.cpp", std::string);
-        CHECK_EQ_TYPE(tests::basename("/home/lala/test.cpp"), "test.cpp", std::string);
-        CHECK_EQ_TYPE(tests::basename("\"/home/lala/test.cpp\""), "test.cpp", std::string);
-        CHECK_EQ_TYPE(tests::basename("C:\\home\\lala\\test.cpp"), "test.cpp", std::string);
-        CHECK_EQ_TYPE(tests::basename("C:\\home\\lala/test.cpp"), "test.cpp", std::string);
-        CHECK_EQ_TYPE(tests::basename("\"C:\\home\\lala\\test.cpp\""), "test.cpp", std::string);
-        CHECK_EQ_TYPE(tests::basename("C:test.cpp"), "test.cpp", std::string);
-        
+        SoundFile file;
+        CHECK(!file.isFileOpen());
+        CHECK(file.open("testdata/test.mp3"));
+        CHECK(file.isFileOpen());
+        CHECK_EQ(file.getPosition(), 0u);
+        CHECK_EQ(file.getChannelCount(), 2);
+        CHECK_EQ(file.getFrameCount(), 2);
+        CHECK_EQ(file.getSampleSize(), 2);
+        CHECK_EQ(file.getSampleRate(), 2u);
+        CHECK_EQ(file.getSample(), 2);
+        CHECK_EQ(file.getPosition(), 1u);
+        file.close();
+        CHECK(!file.isFileOpen());
         return EXIT_SUCCESS;
     }
 }

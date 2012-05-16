@@ -67,6 +67,7 @@ SET(
     musicaccess_TEST_SOURCES
     ${musicaccess_SOURCES}
     src/tests/tests.cpp
+    src/tests/testframework.cpp
     src/tests/main.cpp
     )
 
@@ -74,6 +75,7 @@ SET(
     musicaccess_TEST_HEADERS
     ${musicaccess_HEADERS}
     src/tests/tests.hpp
+    src/tests/testframework.hpp
     src/tests/main.hpp
     )    
 
@@ -86,7 +88,7 @@ INCLUDE_DIRECTORIES(
     )
 
 #to copy a directory (e.g. test files) to another.
-#FILE(COPY ${CMAKE_CURRENT_SOURCE_DIR}/testfiledirectory DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+FILE(COPY ${CMAKE_CURRENT_SOURCE_DIR}/testdata DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/testdata)
 
 IF(DOXYGEN_FOUND)
     #convert semicolon-seperated list to whitespace-seperated one
@@ -130,6 +132,7 @@ TARGET_LINK_LIBRARIES(musicaccess
 ENABLE_TESTING()
 ADD_TEST(basename                  "musicaccesstests" "basename")
 ADD_TEST(endswith                  "musicaccesstests" "endswith")
+ADD_TEST(soundfile                 "musicaccesstests" "soundfile")
 
 ADD_EXECUTABLE(musicaccesstests
     ${musicaccess_TEST_SOURCES}

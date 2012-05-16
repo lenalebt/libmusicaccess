@@ -8,9 +8,6 @@
  */
 int main(int argc, char *argv[]);
 
-namespace tests
-{
-    int testEndsWith();
-}
+
 
 #endif //MAIN_HPP
