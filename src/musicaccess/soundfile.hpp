@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 #include <string>
+#include <mpg123.h>
+#include <sndfile.h>
 
 enum SOUNDFILE_DATATYPE
 {
@@ -25,16 +27,43 @@ class SoundFile
 private:
     int channelCount;
     int sampleSize;   //may be any of 1, 2, 4 bytes.
-    long frameCount;
-    uint32_t sampleRate;
+    long sampleCount;
+    long sampleRate;
     
     uint32_t position;
     
     bool fileOpen;
     
     SOUNDFILE_DATATYPE dataType;
+    
+    mpg123_handle* mpg123Handle;
+    SNDFILE*       sndfileHandle;
+    
+    /**
+     * @brief This class will be used to call to initialization functions of
+     *      mpg123 and libsndfile if they haven't been called before and
+     *      to call to destruction functions.
+     * 
+     * This class counts how often initialize() and destroy() have been called.
+     * Every time the internal counter reaches zero, it will call the destruction
+     * functions of the libraries. If the internal counter leaves zero, the
+     * initialization functions will be called.
+     * 
+     */
+    class SingletonInitializer
+    {
+    private:
+        static SingletonInitializer* instance;
+        SingletonInitializer();
+        int counter;
+    public:
+        static void initialize();
+        static void destroy();
+        ~SingletonInitializer();
+    };
 public:
     SoundFile();
+    ~SoundFile();
     
     /**
      * @brief Opens a music file.
@@ -61,7 +90,7 @@ public:
      * @todo 
      * @bug 
      */
-    void close();
+    bool close();
     
     /**
      * @brief Returns if a file has been opened, or not.
@@ -79,15 +108,15 @@ public:
     int getChannelCount() {return channelCount;}
     
     /**
-     * @brief Retuns the frame count of the music file.
+     * @brief Retuns the sample count of the music file.
      * 
-     * This value is the count of all frames together. A file
-     * with 10 frames and 2 channels has 5 frames per channel.
+     * This value is the count of all samples together. A file
+     * with 10 samples and 2 channels has 5 samples per channel.
      * 
      * @remarks If no file has been opened, the return value is undefined.
-     * @return the frame count
+     * @return the sample count
      */
-    long getFrameCount() {return frameCount;}
+    long getSampleCount() {return sampleCount;}
     
     /**
      * @brief Returns the size of a sample, in bytes.
@@ -114,7 +143,7 @@ public:
      *      sample rate over time. This function does not reflect this fact.
      * @return the sample rate in Hz.
      */
-    uint32_t getSampleRate() {return sampleRate;}
+    long getSampleRate() {return sampleRate;}
     
     /**
      * @brief Returns the sample reader position within the file.
@@ -129,21 +158,23 @@ public:
     uint32_t getPosition() {return position;}
     
     /**
-     * @brief Returns the next sample
+     * @brief Returns the next samples, formatted as float.
      * 
-     * This functions returns the next sample from the opened music file.
-     * It does not take care of channels and so on, so you have to take
-     * care of that on your own. The samples of the different samples
-     * are interleaved, so you will get the samples for the different channles of the
-     * the same time slot one after another.
+     * This functions writes the next <code>count</code> samples to the
+     * supplied blockAddress. it will not take care of how the samples are
+     * arranged, so you have to take care of that for yourself.
      * 
+     * @param buffer The buffer where to save the data. You have to make
+     *      sure that there is enough memory to write to.
+     * @param count The sample count that should be read.
      * @remarks If no file has been opened, the return value is undefined.
-     * @remarks This function will return 32bit integers, regardless of the input
+     * @remarks This function will return 16bit integers, regardless of the input
      *      format. Take a look at getSampleSize() to see what resolution the samples
      *      have.
-     * @return the next sample
+     * @return the sample count that actually was read
      */
-    int32_t getSample();
+    size_t readSamples(int16_t* buffer, int count);
+
 };
 
 #endif  //SOUNDFILE_HPP 
