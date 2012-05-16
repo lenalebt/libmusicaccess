@@ -78,7 +78,7 @@ public:
      * 
      * @todo implementation
      */
-    bool open(std::string filename);
+    bool open(const std::string&);
     
     /**
      * @brief Closes an opened music file.

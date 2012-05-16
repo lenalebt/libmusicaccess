@@ -19,12 +19,23 @@ SoundFile::~SoundFile()
     SingletonInitializer::destroy();
 }
 
-bool SoundFile::open(std::string filename)
+bool SoundFile::open(const std::string& filename)
 {
-    std::transform(filename.begin(), filename.end(), filename.begin(), ::tolower);
-    
-    if (endsWith(filename, ".mp3"))
+    //first: close open files, if any.
+    if (fileOpen)
     {
+        if (!close())
+            return false;
+    }
+    
+    std::string loweredFilename(filename);
+    std::transform(loweredFilename.begin(), loweredFilename.end(), loweredFilename.begin(), ::tolower);
+    
+    std::cerr << loweredFilename << std::endl;
+    
+    //now open the file - take libmpg123 or libsndfile.
+    if (endsWith(loweredFilename, ".mp3"))
+    {   //use libmpg123
         dataType = DATATYPE_MPG123;
         int error;
         mpg123Handle = mpg123_new(NULL, &error);
@@ -83,12 +94,22 @@ bool SoundFile::open(std::string filename)
         return true;
     }
     else
-    {
-        //TODO: try sndfile
+    {   //use libsndfile
         dataType = DATATYPE_SNDFILE;
         
-        fileOpen = false;
-        return false;
+        SF_INFO sfinfo;
+        sfinfo.format = 0;  //documentation says I need to do so
+        sndfileHandle = sf_open(filename.c_str(), SFM_READ, &sfinfo);
+        
+        position = 0;
+        sampleRate = sfinfo.samplerate;
+        channelCount = sfinfo.channels;
+        sampleCount = sfinfo.frames * channelCount;
+        
+        //okay, done now. file is open! somehow less work than with libmpg123.
+        
+        fileOpen = true;
+        return true;
     }
     
     fileOpen = false;
@@ -101,24 +122,34 @@ bool SoundFile::close()
     {
         if (dataType == DATATYPE_MPG123)
         {
-            //TODO: close mpg123 stream
-            
             mpg123_close(mpg123Handle);
             mpg123_delete(mpg123Handle);
             
             mpg123Handle = NULL;
+            sndfileHandle = NULL;
             dataType = DATATYPE_UNKNOWN;
+            fileOpen = false;
             
             return true;
         }
         else if (dataType == DATATYPE_SNDFILE)
         {
-            //TODO: close sndfile stream
-            return false;
+            sf_close(sndfileHandle);
+            
+            mpg123Handle = NULL;
+            sndfileHandle = NULL;
+            dataType = DATATYPE_UNKNOWN;
+            fileOpen = false;
+            
+            return true;
         }
         else
         {
             //do nothing.
+            mpg123Handle = NULL;
+            sndfileHandle = NULL;
+            dataType = DATATYPE_UNKNOWN;
+            fileOpen = false;
             return true;
         }
     }
@@ -129,8 +160,7 @@ bool SoundFile::close()
 size_t SoundFile::readSamples(int16_t* buffer, int count)
 {
     if (dataType == DATATYPE_MPG123)
-    {
-        //TODO: return mpg123 sample
+    {   //return data from libmpg123
         int error;
         size_t bytesRead;
         error = mpg123_read( mpg123Handle, (unsigned char*)buffer, count*sampleSize, &bytesRead );
@@ -153,9 +183,10 @@ size_t SoundFile::readSamples(int16_t* buffer, int count)
         }
     }
     else if (dataType == DATATYPE_SNDFILE)
-    {
-        //TODO: return sndfile sample
-        return 0;
+    {   //return data from libsndfile
+        int itemsRead = sf_read_short(sndfileHandle, buffer, count);
+        position += itemsRead;
+        return itemsRead;
     }
     else
     {
