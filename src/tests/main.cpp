@@ -3,6 +3,8 @@
 #include <cstdlib>
 #include "tests.hpp"
 
+#include "stringhelper.hpp"
+
 
 int main(int argc, char *argv[])
 {
@@ -15,10 +17,25 @@ int main(int argc, char *argv[])
     std::string testname(argv[1]);
     if (testname == "basename")
         return tests::testBasename();
+    else if (testname == "endswith")
+        return tests::testEndsWith();
     else
     {
         std::cout << "test \"" << testname << "\" is unknown." << std::endl;
         return EXIT_FAILURE;
     }
 	return 0;
+}
+
+namespace tests
+{
+    int testEndsWith()
+    {
+        CHECK(endsWith("hello world", "world"));
+        CHECK(!endsWith("hello world!", "world"));
+        CHECK(endsWith("lalalala", "lala"));
+        CHECK(endsWith("lalalala", "la"));
+        CHECK(endsWith("lalalala", "lalalala"));
+        CHECK(!endsWith("lala", "lalalala"));
+    }
 }

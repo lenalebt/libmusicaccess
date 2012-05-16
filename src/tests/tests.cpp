@@ -10,8 +10,6 @@
  * a non-polite manner!
  */
 
-
-
 using namespace std;
 
 namespace tests

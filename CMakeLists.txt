@@ -50,6 +50,7 @@ FIND_PACKAGE(Doxygen)
 SET(
     musicaccess_SOURCES
     src/musicaccess/resample.cpp
+    src/musicaccess/soundfile.cpp
     )
 
 #place header here
@@ -57,6 +58,8 @@ SET(
     musicaccess_HEADERS
     src/musicaccess.hpp
     src/musicaccess/resample.hpp
+    src/musicaccess/soundfile.hpp
+    src/musicaccess/stringhelper.hpp
     )
 
 #put all (possibly autocreated) headers and source files here
@@ -126,6 +129,7 @@ TARGET_LINK_LIBRARIES(musicaccess
 #add unit tests here
 ENABLE_TESTING()
 ADD_TEST(basename                  "musicaccesstests" "basename")
+ADD_TEST(endswith                  "musicaccesstests" "endswith")
 
 ADD_EXECUTABLE(musicaccesstests
     ${musicaccess_TEST_SOURCES}
