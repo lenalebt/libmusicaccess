@@ -33,7 +33,10 @@ namespace tests
         CHECK_EQ(file.getSampleCount(), 1424384);
         CHECK_EQ(file.getSampleSize(), 2);
         CHECK_EQ(file.getSampleRate(), 44100);
-        int16_t buffer[1424384+2];
+        int16_t* buffer = NULL;
+        buffer = new int16_t[1424384+2];
+        //check for buffer allocation was possible
+        CHECK(buffer != NULL);
         CHECK_EQ(file.readSamples(buffer, 500u), 500u);
         CHECK_EQ(file.getPosition(), 500u);
         CHECK_EQ(file.readSamples(buffer+500, 1424384+2), 1424384u-500u);
@@ -93,6 +96,9 @@ namespace tests
         CHECK_EQ(buffer[501], -45);
         CHECK(file.close());
         CHECK(!file.isFileOpen());
+        
+        delete buffer;
         return EXIT_SUCCESS;
+        
     }
 }

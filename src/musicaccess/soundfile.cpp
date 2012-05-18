@@ -196,6 +196,7 @@ size_t SoundFile::readSamples(int16_t* buffer, int count)
 }
 
 
+
 SoundFile::SingletonInitializer* SoundFile::SingletonInitializer::instance = NULL;
 
 SoundFile::SingletonInitializer::SingletonInitializer() :
@@ -233,3 +234,4 @@ SoundFile::SingletonInitializer::~SingletonInitializer()
 {
     
 }
+
