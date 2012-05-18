@@ -127,6 +127,9 @@ TARGET_LINK_LIBRARIES(musicaccess
     ${SNDFILE_LIBRARIES}
     ${MPG123_LIBRARIES}
     )
+SET_TARGET_PROPERTIES(musicaccess
+    PROPERTIES COMPILE_FLAGS "-fPIC -shared"
+    )
 
 #add unit tests here
 ENABLE_TESTING()
@@ -141,6 +144,9 @@ ADD_EXECUTABLE(musicaccesstests
 TARGET_LINK_LIBRARIES(musicaccesstests
     ${SNDFILE_LIBRARIES}
     ${MPG123_LIBRARIES}
+    )
+SET_TARGET_PROPERTIES(musicaccesstests
+    PROPERTIES COMPILE_FLAGS "-fPIC -shared"
     )
 #use "make test" to start all tests.
 

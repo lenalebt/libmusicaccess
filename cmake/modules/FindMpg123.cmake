@@ -7,14 +7,14 @@
 #  MPG123_LIBRARIES - Link these to use MPG123
 
 if (UNIX)
-    FIND_PATH(MPG123_INCLUDE_DIR_UNIX mpg123.h)
+    FIND_PATH(MPG123_INCLUDE_DIR_UNIX mpg123.h PATHS /usr/include)
     FIND_PATH(MPG123_INCLUDE_DIR_WINDOWS mpg123.h)
 else ()
     FIND_PATH(MPG123_INCLUDE_DIR_UNIX mpg123.h)
     FIND_PATH(MPG123_INCLUDE_DIR_WINDOWS mpg123.h.in)
 endif ()
 
-FIND_LIBRARY(MPG123_LIBRARIES NAMES libmpg123 mpg123 )
+FIND_LIBRARY(MPG123_LIBRARIES NAMES libmpg123 mpg123 PATHS /usr/lib /armle-v7/usr/lib)
 
 # handle the QUIETLY and REQUIRED arguments and set MPG123_FOUND to TRUE if 
 # all listed variables are TRUE

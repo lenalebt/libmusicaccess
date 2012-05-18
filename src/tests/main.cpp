@@ -20,6 +20,7 @@ int main(int argc, char *argv[])
     std::string testname(argv[1]);
     std::transform(testname.begin(), testname.end(), testname.begin(), ::tolower);
     
+    std::cout << "running test \"" << testname << "\"..." << std::flush << std::endl;
     if (testname == "basename")
         return tests::testBasename();
     else if (testname == "endswith")

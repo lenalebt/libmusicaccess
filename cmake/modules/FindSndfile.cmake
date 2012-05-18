@@ -9,9 +9,9 @@ IF(SNDFILE_INCLUDE_DIR)
     SET(SNDFILE_FIND_QUIETLY TRUE)
 ENDIF(SNDFILE_INCLUDE_DIR)
 
-FIND_PATH(SNDFILE_INCLUDE_DIR sndfile.h)
+FIND_PATH(SNDFILE_INCLUDE_DIR sndfile.h PATHS /usr/include)
 
-FIND_LIBRARY(SNDFILE_LIBRARY NAMES sndfile sndfile-1)
+FIND_LIBRARY(SNDFILE_LIBRARY NAMES sndfile sndfile-1 PATHS /usr/lib /armle-v7/usr/lib)
 
 # Handle the QUIETLY and REQUIRED arguments and set SNDFILE_FOUND to TRUE if
 # all listed variables are TRUE.
