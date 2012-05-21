@@ -15,6 +15,8 @@ SoundFile::SoundFile() :
 }
 SoundFile::~SoundFile()
 {
+    if (fileOpen)
+        close();
     //will destroy mpg123 and sndfile if necessary
     SingletonInitializer::destroy();
 }

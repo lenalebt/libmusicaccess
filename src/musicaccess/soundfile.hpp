@@ -19,6 +19,22 @@ enum SOUNDFILE_DATATYPE
  * 
  * Endianess if automatically converted to the correct format for the CPU.
  * 
+ * @code
+ * SoundFile soundfile;
+ * 
+ * soundfile.open("test.mp3");
+ * int16_t* buffer = new int16_t[soundfile.getSampleCount()];
+ * soundfile.readSamples(buffer, soundfile.getSampleCount());
+ * 
+ * //now, you can use buffer to access the samples.
+ * //note that the samples of the different channels are interleaved.
+ * 
+ * //do some processing
+ * 
+ * delete[] buffer;
+ * soundfile.close();
+ * @endcode
+ * 
  * @remarks Using this class, you will get the data in an integer format,
  * regardless of the possibilities in the underlying format.
  */
@@ -75,20 +91,11 @@ public:
      * 
      * @param filename The filename you want to open.
      * @return <code>true</code>, if opening the file was successful, <code>false</code> otherwise.
-     * 
-     * @todo implementation
      */
     bool open(const std::string&);
     
     /**
      * @brief Closes an opened music file.
-     * 
-     * 
-     * 
-     * 
-     * @remarks 
-     * @todo 
-     * @bug 
      */
     bool close();
     
