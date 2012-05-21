@@ -125,6 +125,16 @@ namespace tests
         
         CHECK(sampleCount < oldSampleCount);
         
+        //write our filtered data to disk
+        SF_INFO sfinfo;
+        sfinfo.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
+        sfinfo.samplerate = 22050;
+        sfinfo.channels = 1;
+        
+        SNDFILE* sndfileHandle = sf_open("./test-resampled-22khz-mono.wav", SFM_WRITE, &sfinfo);
+        sf_writef_short(sndfileHandle, buffer, sampleCount);
+        sf_close(sndfileHandle);
+        
         return EXIT_SUCCESS;
     }
     

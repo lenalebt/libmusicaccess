@@ -6,6 +6,8 @@
 /**
  * @brief This class defines a simple audio filter.
  * 
+ * You cannot do more than apply this filter.
+ * 
  * This is a pure virtual class, derive your own filters from this class.
  * 
  * @author Lena Brueder
@@ -16,6 +18,9 @@ class AudioFilter
 private:
     
 public:
+    /**
+     * @brief Apply this filter to the given buffer with the given size.
+     */
     virtual void apply(int16_t* buffer, int bufferSize)=0;
 };
 

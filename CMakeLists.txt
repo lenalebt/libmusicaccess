@@ -223,3 +223,7 @@ FILE(GLOB music_global_headers "${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp")
 INSTALL (FILES ${music_global_headers}
     DESTINATION include
     )
+FILE(GLOB music_special_headers "${CMAKE_CURRENT_SOURCE_DIR}/src/musicaccess/*.hpp")
+INSTALL (FILES ${music_special_headers}
+    DESTINATION include/musicaccess
+    )

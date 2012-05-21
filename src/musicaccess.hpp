@@ -13,7 +13,10 @@
  * libmusicaccess allows opening, filtering and resampling tasks.
  * 
  * @section mainpage_usage Standard usage
- * If you want to open and read a file, you would use SoundFile.
+ * If you want to open and read a file, you would use SoundFile. You will find some examples
+ * there.
+ * 
+ * To resample a given piece of audio, feed it to Resampler22kHzMono.
  * 
  */
 

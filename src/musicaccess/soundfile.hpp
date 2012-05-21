@@ -35,6 +35,7 @@ enum SOUNDFILE_DATATYPE
  * soundfile.close();
  * @endcode
  * 
+ * 
  * @remarks Using this class, you will get the data in an integer format,
  * regardless of the possibilities in the underlying format.
  */

@@ -34,13 +34,14 @@ void Resampler22kHzMono::resample(uint32_t fromSampleRate, int16_t** samplePtr, 
     
     if (fromSampleRate == 44100)
     {
-        newSamples = new int16_t[sampleCount/2];
         sampleCount /= 2;
+        newSamples = new int16_t[sampleCount];
         for (int i=0; i<sampleCount; i++)
         {
             newSamples[i] = monoSamples[i*2];
         }
-        
+        *samplePtr = newSamples;
+        delete[] monoSamples;
     }
     else
     {
