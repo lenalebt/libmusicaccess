@@ -27,6 +27,10 @@ int main(int argc, char *argv[])
         return tests::testEndsWith();
     else if (testname == "soundfile")
         return tests::testSoundFile();
+    else if (testname == "iirfilter")
+        return tests::testIIRFilter();
+    else if (testname == "resampling")
+        return tests::testResampling();
     else
     {
         std::cout << "test \"" << testname << "\" is unknown." << std::endl;

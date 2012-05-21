@@ -50,6 +50,7 @@ FIND_PACKAGE(Doxygen)
 SET(
     musicaccess_SOURCES
     src/musicaccess/resample.cpp
+    src/musicaccess/filter.cpp
     src/musicaccess/soundfile.cpp
     )
 
@@ -58,6 +59,7 @@ SET(
     musicaccess_HEADERS
     src/musicaccess.hpp
     src/musicaccess/resample.hpp
+    src/musicaccess/filter.hpp
     src/musicaccess/soundfile.hpp
     src/musicaccess/stringhelper.hpp
     )
@@ -136,6 +138,12 @@ ENABLE_TESTING()
 ADD_TEST(basename                  "musicaccesstests" "basename")
 ADD_TEST(endswith                  "musicaccesstests" "endswith")
 ADD_TEST(soundfile                 "musicaccesstests" "soundfile")
+
+ADD_TEST(iirfilter                 "musicaccesstests" "iirfilter")
+SET_TESTS_PROPERTIES(iirfilter PROPERTIES DEPENDS soundfile)
+
+ADD_TEST(resampling                "musicaccesstests" "resampling")
+SET_TESTS_PROPERTIES(resampling PROPERTIES DEPENDS soundfile)
 
 ADD_EXECUTABLE(musicaccesstests
     ${musicaccess_TEST_SOURCES}
