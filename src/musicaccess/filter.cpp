@@ -22,36 +22,6 @@ IIRFilter* IIRFilter::createLowpassFilter(uint32_t cutoffFreq, uint32_t sampleFr
     switch (sampleFreq)
     {
         //values computed with matlabs signal processing toolbox via call
-        //[B, A] = cheby2(10, 30, 22050/88200)
-        case 88200:
-        {
-            filter->A=11;
-            filter->a[0] = 1.0f;
-            filter->a[1] = -4.17080464f;
-            filter->a[2] =  8.91329399f;
-            filter->a[3] = -11.9920025f;
-            filter->a[4] =  11.1879050f;
-            filter->a[5] = -7.42360145f;
-            filter->a[6] =  3.55697835f;
-            filter->a[7] = -1.19505797f;
-            filter->a[8] =  0.27717187f;
-            filter->a[9] = -0.03833772f;
-            filter->a[10] = 0.00423613f;
-            
-            filter->B=11;
-            filter->b[0] =  0.04332672f;
-            filter->b[1] = -0.10186748f;
-            filter->b[2] =  0.18758271f;
-            filter->b[3] = -0.18697261f;
-            filter->b[4] =  0.19241833f;
-            filter->b[5] = -0.14919432f;
-            filter->b[6] =  0.19241833f;
-            filter->b[7] = -0.18697261f;
-            filter->b[8] =  0.18758271f;
-            filter->b[9] = -0.10186748f;
-            filter->b[10] = 0.04332672f;
-            break;
-        }
         //[B, A] = cheby2(10, 30, 22050/96000)
         case 96000:
         {
@@ -116,17 +86,17 @@ IIRFilter* IIRFilter::createLowpassFilter(uint32_t cutoffFreq, uint32_t sampleFr
         case 44100:
         {
             filter->A=11;
-            filter->a[0] =   1.0;
-            filter->a[1] =   1.50500881207773;
-            filter->a[2] =   3.11938845853393;
-            filter->a[3] =   3.4537421088511;
-            filter->a[4] =   3.6312250035913;
-            filter->a[5] =   2.82111784388383;
-            filter->a[6] =   1.84680283924253;
-            filter->a[7] =   0.938359373015455;
-            filter->a[8] =   0.365567895786165;
-            filter->a[9] =   0.0984972917934475;
-            filter->a[10] =  0.0145345633709583;
+            filter->a[0] =  1.0;
+            filter->a[1] =  1.50500881207773;
+            filter->a[2] =  3.11938845853393;
+            filter->a[3] =  3.4537421088511;
+            filter->a[4] =  3.6312250035913;
+            filter->a[5] =  2.82111784388383;
+            filter->a[6] =  1.84680283924253;
+            filter->a[7] =  0.938359373015455;
+            filter->a[8] =  0.365567895786165;
+            filter->a[9] =  0.0984972917934475;
+            filter->a[10] = 0.0145345633709583;
             
             filter->B=11;
             filter->b[0] =  0.120554052756238;
@@ -146,17 +116,17 @@ IIRFilter* IIRFilter::createLowpassFilter(uint32_t cutoffFreq, uint32_t sampleFr
         case 32000:
         {
             filter->A=11;
-            filter->a[0] =    1.0;                  
-            filter->a[1] =    5.4354699524962;
-            filter->a[2] =   14.8548806539766;
-            filter->a[3] =   26.1817402752583;
-            filter->a[4] =   32.5631491684131;
-            filter->a[5] =   29.6421377378847;
-            filter->a[6] =   19.9082881808206;
-            filter->a[7] =    9.71338143459609;
-            filter->a[8] =    3.2901038507573;
-            filter->a[9] =    0.69844431306359;
-            filter->a[10] =   0.0706387394299939;
+            filter->a[0] =  1.0;                  
+            filter->a[1] =  5.4354699524962;
+            filter->a[2] = 14.8548806539766;
+            filter->a[3] = 26.1817402752583;
+            filter->a[4] = 32.5631491684131;
+            filter->a[5] = 29.6421377378847;
+            filter->a[6] = 19.9082881808206;
+            filter->a[7] =  9.71338143459609;
+            filter->a[8] =  3.2901038507573;
+            filter->a[9] =  0.69844431306359;
+            filter->a[10] = 0.0706387394299939;
             
             filter->B=11;
             filter->b[0] =  0.265779493545935;
@@ -192,9 +162,9 @@ IIRFilter* IIRFilter::createLowpassFilter(uint32_t cutoffFreq, uint32_t sampleFr
 IIRFilter* IIRFilter::createNOOPFilter()
 {
     IIRFilter* filter = new IIRFilter();
-    filter->A=0;
+    filter->A = 0;
     filter->b[0] = 1.0f;
-    filter->B=1;
+    filter->B = 1;
     return filter;
 }
 
@@ -202,8 +172,8 @@ void IIRFilter::apply(int16_t* buffer, int bufferSize)
 {
     //applies an IIR filter in-place.
     
-    int16_t history[1024];
-    for (int i = 0; i < 1024; i++)
+    int16_t history[64];
+    for (int i = 0; i < 64; i++)
     {
         history[i] = 0;
     }
@@ -211,8 +181,8 @@ void IIRFilter::apply(int16_t* buffer, int bufferSize)
     int historyPos=0;
     for (int i = 0; i < bufferSize; i++, historyPos++)
     {
-        if (historyPos >= 1024)
-            historyPos -= 1024;
+        if (historyPos >= 64)
+            historyPos -= 64;
         
         //save history, we need it because of the recursive structure (input values will be overwritten)
         history[historyPos] = buffer[i];
@@ -221,13 +191,12 @@ void IIRFilter::apply(int16_t* buffer, int bufferSize)
         for (int k = 0; k < B; k++)
         {
             //this is b[k] * x[i-k], written in terms of the history of our 1024 most recent input samples
-            tmpVal += b[k] * history[(historyPos - k + 1024) % 1024];
+            tmpVal += b[k] * history[(historyPos - k + 64) % 64];
         }
         for (int l = 1; l < A; l++)
         {
-            tmpVal -= a[l] * ((i-l<0) ? 0 : buffer[i - l]);
+            tmpVal -= a[l] * ((i-l<0) ? buffer[0] : buffer[i - l]);
         }
-        //std::cerr << buffer[i] <<" <=> " << (int16_t)tmpVal << std::endl;
         buffer[i] = (int16_t)tmpVal;
     }
 }

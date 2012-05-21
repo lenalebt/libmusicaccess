@@ -110,21 +110,38 @@ namespace tests
     
     int testResampling()
     {
-        return EXIT_FAILURE;
+        Resampler22kHzMono resampler;
+        
+        SoundFile file;
+        file.open("./testdata/test.mp3");
+        int16_t* buffer = NULL;
+        int sampleCount = file.getSampleCount();
+        int oldSampleCount = sampleCount;
+        buffer = new int16_t[sampleCount];
+        CHECK(buffer != NULL);
+        file.readSamples(buffer, sampleCount);
+        
+        resampler.resample(file.getSampleRate(), &buffer, sampleCount, file.getChannelCount());
+        
+        CHECK(sampleCount < oldSampleCount);
+        
+        return EXIT_SUCCESS;
     }
     
     int testIIRFilter()
     {
         SoundFile file;
         file.open("./testdata/test.mp3");
-        int16_t* buffer;
-        int16_t* buffer2;
+        int16_t* buffer = NULL;
+        int16_t* buffer2 = NULL;
         
         CHECK_EQ(file.getSampleCount(), 1424384u);
         
         buffer = new int16_t[file.getSampleCount()];
+        CHECK(buffer != NULL);
         int monoSampleCount = file.getSampleCount()/2;
         buffer2 = new int16_t[monoSampleCount];
+        CHECK(buffer2 != NULL);
         file.readSamples(buffer, file.getSampleCount());
         
         std::cerr << "converting file to mono..." << std::endl;
@@ -133,7 +150,9 @@ namespace tests
             buffer2[i/2] = (int32_t(buffer[i]) + int32_t(buffer[i+1])) / 2;
         }
         delete buffer;
+        buffer = NULL;
         buffer = new int16_t[monoSampleCount];
+        CHECK(buffer != NULL);
         memcpy(buffer, buffer2, monoSampleCount*sizeof(int16_t));
         bool arraysAreEqual=true;
         CHECK(buffer != buffer2);
@@ -180,15 +199,21 @@ namespace tests
         }
         CHECK(!arraysAreEqual);
         
+        //okay, we know that our filter did "something".
+        
+        
+        //write our filtered data to disk
         SF_INFO sfinfo;
         sfinfo.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
         sfinfo.samplerate = 44100;
         sfinfo.channels = 1;
         
-        SNDFILE* sndfileHandle = sf_open("./filtered.wav", SFM_WRITE, &sfinfo);
+        SNDFILE* sndfileHandle = sf_open("./test-iirfilter-filtered.wav", SFM_WRITE, &sfinfo);
         sf_writef_short(sndfileHandle, buffer, monoSampleCount);
         sf_close(sndfileHandle);
         
+        //testing works somehow manual. this is not optimal, but I don't
+        //have anything better for now.
         
         return EXIT_SUCCESS;
     }
