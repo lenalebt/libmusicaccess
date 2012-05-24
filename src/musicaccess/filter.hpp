@@ -40,9 +40,9 @@ private:
     IIRFilter();
 protected:
     //coefficients for input values
-    float a[64];
+    double a[64];
     //coefficients for feedback values
-    float b[64];
+    double b[64];
     //input coefficient count
     int A;
     //feedback coefficient count
