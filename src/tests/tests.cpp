@@ -138,8 +138,8 @@ namespace tests
         sf_writef_short(sndfileHandle, buffer, sampleCount);
         sf_close(sndfileHandle);
         
-        //file.open("./testdata/test-32khz.mp3");
-        file.open("./testdata/sine-9900.mp3");
+        file.open("./testdata/test-32khz.mp3");
+        //file.open("./testdata/sine-9900.mp3");
         delete[] buffer;
         buffer = NULL;
         sampleCount = file.getSampleCount();
@@ -253,8 +253,8 @@ namespace tests
         
         
         std::cerr << "reading 32khz file..." << std::endl;
-        file.open("./testdata/test-32khz.mp3");
-        //file.open("./testdata/sine-9900.mp3");
+        //file.open("./testdata/test-32khz.mp3");
+        file.open("./testdata/sine-9900.mp3");
         delete[] buffer;
         buffer = NULL;
         int sampleCount = file.getSampleCount();
