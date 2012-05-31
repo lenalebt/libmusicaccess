@@ -146,11 +146,34 @@ IIRFilter* IIRFilter::createLowpassFilter(uint32_t cutoffFreq, uint32_t sampleFr
             filter->b[10] =0.202990136426642;
             break;
         }
+        //[B, A] = cheby2(10, 30, 20000/22050)
         case 22050:
         {
-            filter->A=0;
-            filter->b[0] = 1.0f;
-            filter->B=1;
+            filter->A=11;
+            filter->a[0] =                  1;  
+            filter->a[1] =   9.00294974441401;
+            filter->a[2] =   36.6942073406543;
+            filter->a[3] =   89.1469195728968;
+            filter->a[4] =   142.941542555843;
+            filter->a[5] =   158.041090321997;
+            filter->a[6] =   122.007007238357;
+            filter->a[7] =   64.9328261936864;
+            filter->a[8] =   22.7979812493626;
+            filter->a[9] =   4.76798483459591;
+            filter->a[10] = 0.451032474144709;
+            
+            filter->B=11;
+            filter->b[0] =   0.6715895131289;
+            filter->b[1] =  6.57291943950069;
+            filter->b[2] =  29.0883921644318;
+            filter->b[3] =  76.6511141220782;
+            filter->b[4] =  133.185903705436;
+            filter->b[5] =  159.443703636803;
+            filter->b[6] =  133.185903705436;
+            filter->b[7] =  76.6511141220782;
+            filter->b[8] =  29.0883921644318;
+            filter->b[9] =   6.5729194395007;
+            filter->b[10] =  0.6715895131289;
             break;
         }
         default:
