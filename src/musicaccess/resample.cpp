@@ -177,11 +177,6 @@ bool Resampler22kHzMono::resample(int16_t** samplePtr, int& sampleCount, double 
     
 }
 
-bool Resampler22kHzMono::resample2(int16_t** samplePtr, int& sampleCount, double factor)
-{
-    
-}
-
 //introduces zeros
 template<typename T>
 inline
@@ -221,6 +216,43 @@ bool Resampler22kHzMono::resample(int16_t** samplePtr, int& sampleCount, int32_t
             sum += double(getArrayElement<int16_t>(*samplePtr, n*T, sampleCount, fromRate)) *
                 sinc(fs*(t - n*T));
             newVal += sinc(fs*(t - n*T));
+        }
+        //std::cout << t << " " << double(getArrayElement<int16_t>(*samplePtr, t*fs*T, sampleCount, fromRate)) << " " << newVal << std::endl;
+        newSamples[m] = sum;
+    }
+    
+    delete[] *samplePtr;
+    *samplePtr = newSamples;
+    sampleCount = newSampleCount;
+    
+    return true;
+}
+
+bool Resampler22kHzMono::resample2(int16_t** samplePtr, int& sampleCount, int32_t fromRate, int32_t toRate)
+{
+    double fs = fromRate;
+    double fs_ = toRate;
+    
+    double T = 1.0/fs;
+    double T_ = 1.0/fs_;
+    
+    int16_t* newSamples = NULL;
+    int newSampleCount = int(sampleCount * fs_ / fs) + 1;
+    newSamples = new int16_t[newSampleCount];
+    if (!newSamples)
+        return false;
+    
+    for (int m=0; m<newSampleCount; m++)
+    {
+        double t = m * T_;
+        
+        //double newVal=0.0;
+        double sum=0.0;
+        for(int n=-10 + std::floor(t*fs+0.5); n <= 10 + std::floor(t*fs+0.5); n++ )
+        {
+            sum += double(getArrayElement<int16_t>(*samplePtr, n*T, sampleCount, fromRate)) *
+                sinc(fs*(t - n*T));
+            //newVal += sinc(fs*(t - n*T));
         }
         //std::cout << t << " " << double(getArrayElement<int16_t>(*samplePtr, t*fs*T, sampleCount, fromRate)) << " " << newVal << std::endl;
         newSamples[m] = sum;
@@ -281,6 +313,8 @@ bool Resampler22kHzMono::resample(uint32_t fromSampleRate, int16_t** samplePtr, 
     //first, apply low-pass filtering - we need this prior to resampling.
     IIRFilter* filter = IIRFilter::createLowpassFilter(11025, fromSampleRate);
     filter->apply(*samplePtr, sampleCount);
+    delete filter;
+    filter=NULL;
     
     //write our filtered data to disk
     SF_INFO sfinfo;
@@ -301,7 +335,22 @@ bool Resampler22kHzMono::resample(uint32_t fromSampleRate, int16_t** samplePtr, 
     else
     {
         //resample(samplePtr, sampleCount, 22050.0 / double(fromSampleRate));
-        resample(samplePtr, sampleCount, fromSampleRate, 22050);
+        /*resample(samplePtr, sampleCount, fromSampleRate, 44100);
+        
+        SF_INFO sfinfo;
+        sfinfo.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
+        sfinfo.samplerate = 44100;
+        sfinfo.channels = 1;
+        
+        SNDFILE* sndfileHandle = sf_open("./test-resampling-midway2.wav", SFM_WRITE, &sfinfo);
+        sf_writef_short(sndfileHandle, *samplePtr, sampleCount);
+        sf_close(sndfileHandle);
+        
+        filter = IIRFilter::createLowpassFilter(11025, 44100);
+        filter->apply(*samplePtr, sampleCount);
+        downsample(samplePtr, sampleCount, 2);*/
+        //resample(samplePtr, sampleCount, fromSampleRate, 22050);
+        resample2(samplePtr, sampleCount, fromSampleRate, 32000);
         //do upsampling, then downsampling.
     }
     

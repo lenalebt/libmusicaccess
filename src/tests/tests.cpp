@@ -138,8 +138,8 @@ namespace tests
         sf_writef_short(sndfileHandle, buffer, sampleCount);
         sf_close(sndfileHandle);
         
-        file.open("./testdata/test-32khz.mp3");
-        //file.open("./testdata/sine-9900.mp3");
+        //file.open("./testdata/test-32khz.mp3");
+        file.open("./testdata/sine-9000.wav");
         delete[] buffer;
         buffer = NULL;
         sampleCount = file.getSampleCount();
@@ -157,7 +157,7 @@ namespace tests
         
         //write our filtered data to disk
         sfinfo.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
-        sfinfo.samplerate = 22050;
+        sfinfo.samplerate = 32000;
         sfinfo.channels = 1;
         
         sndfileHandle = sf_open("./test-resampled-from32khz-22khz-mono.wav", SFM_WRITE, &sfinfo);
@@ -253,8 +253,8 @@ namespace tests
         
         
         std::cerr << "reading 32khz file..." << std::endl;
-        //file.open("./testdata/test-32khz.mp3");
-        file.open("./testdata/sine-9900.mp3");
+        file.open("./testdata/test-32khz.mp3");
+        //file.open("./testdata/sine-9900.mp3");
         delete[] buffer;
         buffer = NULL;
         int sampleCount = file.getSampleCount();
