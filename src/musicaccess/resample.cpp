@@ -133,6 +133,7 @@ T getArrayElement(T* array, int element, int count)
         return array[element];
 }
 
+
 bool Resampler22kHzMono::resample(int16_t** samplePtr, int& sampleCount, double factor)
 {
     //use this to speed up for loops, as multiplication is faster than division
@@ -155,16 +156,16 @@ bool Resampler22kHzMono::resample(int16_t** samplePtr, int& sampleCount, double 
         
         for (int j=-10; j<10+1; j++)
         {
-            sourceMidPoint = i*divisor + j;
+            sourceMidPoint = double(i)/factor + j;
             intSourceMidPoint = std::floor(sourceMidPoint + 0.5);
             //+0.5 to automatically round the right way
             newValue += double(getArrayElement<int16_t>(*samplePtr, intSourceMidPoint, sampleCount)) *
                         //shifted sinc
                         sinc(sourceMidPoint - intSourceMidPoint + j);
             testval += sinc(sourceMidPoint - intSourceMidPoint + j);
-            //std::cout << intSourceMidPoint << " " << sourceMidPoint - intSourceMidPoint + j << " | ";
+            std::cout << sourceMidPoint << " " << sourceMidPoint - intSourceMidPoint + j << " " << sinc(sourceMidPoint - intSourceMidPoint + j) << " | ";
         }
-        //std::cout << testval << std::endl;
+        std::cout << testval << std::endl;
         newSamples[i] = newValue;
     }
     
@@ -175,6 +176,63 @@ bool Resampler22kHzMono::resample(int16_t** samplePtr, int& sampleCount, double 
     return true;
     
 }
+
+bool Resampler22kHzMono::resample2(int16_t** samplePtr, int& sampleCount, double factor)
+{
+    
+}
+
+//introduces zeros
+template<typename T>
+inline
+T getArrayElement(T* array, double time, int count, int32_t rate)
+{
+    if (time < 0)
+        return 0.0;
+    else if (time >= double(count)/rate)
+        return 0.0;
+    else
+        return array[int(time*rate)];
+    
+}
+
+bool Resampler22kHzMono::resample(int16_t** samplePtr, int& sampleCount, int32_t fromRate, int32_t toRate)
+{
+    double fs = fromRate;
+    double fs_ = toRate;
+    
+    double T = 1.0/fs;
+    double T_ = 1.0/fs_;
+    
+    int16_t* newSamples = NULL;
+    int newSampleCount = int(sampleCount * fs_ / fs) + 1;
+    newSamples = new int16_t[newSampleCount];
+    if (!newSamples)
+        return false;
+    
+    for (int m=0; m<newSampleCount; m++)
+    {
+        double t = m * T_;
+        
+        double newVal=0.0;
+        double sum=0.0;
+        for(int n=-10 + std::floor(t*fs+0.5); n <= 10 + std::floor(t*fs+0.5); n++ )
+        {
+            sum += double(getArrayElement<int16_t>(*samplePtr, n*T, sampleCount, fromRate)) *
+                sinc(fs*(t - n*T));
+            newVal += sinc(fs*(t - n*T));
+        }
+        //std::cout << t << " " << double(getArrayElement<int16_t>(*samplePtr, t*fs*T, sampleCount, fromRate)) << " " << newVal << std::endl;
+        newSamples[m] = sum;
+    }
+    
+    delete[] *samplePtr;
+    *samplePtr = newSamples;
+    sampleCount = newSampleCount;
+    
+    return true;
+}
+
 bool Resampler22kHzMono::downsample(int16_t** samplePtr, int& sampleCount, unsigned int factor)
 {
     //use sampleCount / factor samples
@@ -224,6 +282,16 @@ bool Resampler22kHzMono::resample(uint32_t fromSampleRate, int16_t** samplePtr, 
     IIRFilter* filter = IIRFilter::createLowpassFilter(11025, fromSampleRate);
     filter->apply(*samplePtr, sampleCount);
     
+    //write our filtered data to disk
+    SF_INFO sfinfo;
+    sfinfo.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
+    sfinfo.samplerate = fromSampleRate;
+    sfinfo.channels = 1;
+    
+    SNDFILE* sndfileHandle = sf_open("./test-resampling-midway.wav", SFM_WRITE, &sfinfo);
+    sf_writef_short(sndfileHandle, *samplePtr, sampleCount);
+    sf_close(sndfileHandle);
+    
     //if we have an integer factor between sample rates, it is okay to
     //skip upsampling. this is /way/ faster.
     if ((fromSampleRate % 22050) == 0)
@@ -232,7 +300,8 @@ bool Resampler22kHzMono::resample(uint32_t fromSampleRate, int16_t** samplePtr, 
     }
     else
     {
-        resample(samplePtr, sampleCount, 22050.0 / double(fromSampleRate));
+        //resample(samplePtr, sampleCount, 22050.0 / double(fromSampleRate));
+        resample(samplePtr, sampleCount, fromSampleRate, 22050);
         //do upsampling, then downsampling.
     }
     
