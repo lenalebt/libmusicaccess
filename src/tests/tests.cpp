@@ -123,7 +123,10 @@ namespace tests
         
         resampler.resample(file.getSampleRate(), &buffer, sampleCount, file.getChannelCount());
         
+        //we need to have less samples. better check see below.
         CHECK(sampleCount < oldSampleCount);
+        //half the sample rate, mono instead of stereo -> 1/4 the sample count
+        //CHECK_EQ(sampleCount, oldSampleCount/4);
         
         //write our filtered data to disk
         SF_INFO sfinfo;
@@ -132,6 +135,32 @@ namespace tests
         sfinfo.channels = 1;
         
         SNDFILE* sndfileHandle = sf_open("./test-resampled-22khz-mono.wav", SFM_WRITE, &sfinfo);
+        sf_writef_short(sndfileHandle, buffer, sampleCount);
+        sf_close(sndfileHandle);
+        
+        //file.open("./testdata/test-32khz.mp3");
+        file.open("./testdata/sine-9900.mp3");
+        delete[] buffer;
+        buffer = NULL;
+        sampleCount = file.getSampleCount();
+        oldSampleCount = sampleCount;
+        buffer = new int16_t[sampleCount];
+        CHECK(buffer != NULL);
+        file.readSamples(buffer, sampleCount);
+        
+        resampler.resample(file.getSampleRate(), &buffer, sampleCount, file.getChannelCount());
+        
+        //we need to have less samples. better check see below.
+        //CHECK(sampleCount < oldSampleCount);
+        //half the sample rate, mono instead of stereo -> 1/4 the sample count
+        //CHECK_EQ_TYPE(sampleCount, 1033566/2.0*22050.0/32000.0 + 1, int);
+        
+        //write our filtered data to disk
+        sfinfo.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
+        sfinfo.samplerate = 22050;
+        sfinfo.channels = 1;
+        
+        sndfileHandle = sf_open("./test-resampled-from32khz-22khz-mono.wav", SFM_WRITE, &sfinfo);
         sf_writef_short(sndfileHandle, buffer, sampleCount);
         sf_close(sndfileHandle);
         
@@ -159,7 +188,7 @@ namespace tests
         {
             buffer2[i/2] = (int32_t(buffer[i]) + int32_t(buffer[i+1])) / 2;
         }
-        delete buffer;
+        delete[] buffer;
         buffer = NULL;
         buffer = new int16_t[monoSampleCount];
         CHECK(buffer != NULL);
@@ -219,6 +248,64 @@ namespace tests
         sfinfo.channels = 1;
         
         SNDFILE* sndfileHandle = sf_open("./test-iirfilter-filtered.wav", SFM_WRITE, &sfinfo);
+        sf_writef_short(sndfileHandle, buffer, monoSampleCount);
+        sf_close(sndfileHandle);
+        
+        
+        std::cerr << "reading 32khz file..." << std::endl;
+        file.open("./testdata/test-32khz.mp3");
+        //file.open("./testdata/sine-9900.mp3");
+        delete[] buffer;
+        buffer = NULL;
+        int sampleCount = file.getSampleCount();
+        buffer = new int16_t[sampleCount];
+        CHECK(buffer != NULL);
+        file.readSamples(buffer, sampleCount);
+        
+        if (file.getChannelCount() == 2)
+        {
+            std::cerr << "converting file to mono..." << std::endl;
+            monoSampleCount = file.getSampleCount()/2;
+            buffer2 = new int16_t[monoSampleCount];
+            CHECK(buffer2 != NULL);
+            for(int i=0; i< file.getSampleCount(); i+=2)
+            {
+                buffer2[i/2] = (int32_t(buffer[i]) + int32_t(buffer[i+1])) / 2;
+            }
+            delete[] buffer;
+            buffer = NULL;
+            buffer = new int16_t[monoSampleCount];
+            CHECK(buffer != NULL);
+            memcpy(buffer, buffer2, monoSampleCount*sizeof(int16_t));
+            arraysAreEqual=true;
+            CHECK(buffer != buffer2);
+        }
+        else
+        {
+            monoSampleCount = sampleCount;
+        }
+        
+        std::cerr << "applying filter to 32khz signal..." << std::endl;
+        IIRFilter* lowpassFilter2 = NULL;
+        lowpassFilter2 = IIRFilter::createLowpassFilter(11025, file.getSampleRate());
+        CHECK(lowpassFilter2 != NULL);
+        lowpassFilter2->apply(buffer, monoSampleCount);
+        
+        for (int i = 0; i < monoSampleCount; i++)
+        {
+            arraysAreEqual = arraysAreEqual && (buffer[i] == buffer2[i]);
+        }
+        CHECK(!arraysAreEqual);
+        
+        //okay, we know that our filter did "something".
+        
+        
+        //write our filtered data to disk
+        sfinfo.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
+        sfinfo.samplerate = 32000;
+        sfinfo.channels = 1;
+        
+        sndfileHandle = sf_open("./test-iirfilter-filtered-32khz.wav", SFM_WRITE, &sfinfo);
         sf_writef_short(sndfileHandle, buffer, monoSampleCount);
         sf_close(sndfileHandle);
         

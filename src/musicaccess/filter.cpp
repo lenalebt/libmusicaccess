@@ -2,6 +2,7 @@
 
 #include <cstring>
 #include <iostream>
+#include <cmath>
 
 IIRFilter::IIRFilter()
 {
@@ -19,6 +20,8 @@ IIRFilter* IIRFilter::createLowpassFilter(uint32_t cutoffFreq, uint32_t sampleFr
         cutoffFreq = 11025;
     }
     IIRFilter* filter = new IIRFilter();
+    std::cout << "sample freq:" << sampleFreq << std::endl;
+    
     switch (sampleFreq)
     {
         //values computed with matlabs signal processing toolbox via call
@@ -83,6 +86,7 @@ IIRFilter* IIRFilter::createLowpassFilter(uint32_t cutoffFreq, uint32_t sampleFr
             break;
         }
         //[B, A] = cheby2(10, 30, 20000/44100)
+        //case 32000:
         case 44100:
         {
             filter->A=11;
@@ -116,7 +120,7 @@ IIRFilter* IIRFilter::createLowpassFilter(uint32_t cutoffFreq, uint32_t sampleFr
         case 32000:
         {
             filter->A=11;
-            filter->a[0] =                 1.0;  
+            filter->a[0] =                   1;  
             filter->a[1] =    4.16245715800272;
             filter->a[2] =    9.66995033402719;
             filter->a[3] =    15.1521776287505;
@@ -187,7 +191,7 @@ void IIRFilter::apply(int16_t* buffer, int bufferSize)
         //save history, we need it because of the recursive structure (input values will be overwritten)
         history[historyPos] = buffer[i];
         
-        float tmpVal=0.0f;
+        double tmpVal=0.0;
         for (int k = 0; k < B; k++)
         {
             //this is b[k] * x[i-k], written in terms of the history of our 1024 most recent input samples
@@ -195,8 +199,8 @@ void IIRFilter::apply(int16_t* buffer, int bufferSize)
         }
         for (int l = 1; l < A; l++)
         {
-            tmpVal -= a[l] * ((i-l<0) ? buffer[0] : buffer[i - l]);
+            tmpVal -= a[l] * ((i-l<0) ? 0.0 : buffer[i - l]);
         }
-        buffer[i] = (int16_t)tmpVal;
+        buffer[i] = int16_t(std::floor(tmpVal+0.5));
     }
 }
