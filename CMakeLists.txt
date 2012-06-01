@@ -45,6 +45,9 @@ FIND_PACKAGE(Sndfile REQUIRED)
 FIND_PACKAGE(Mpg123 REQUIRED)
 #use doxygen for documentation. don't need this for compilation.
 FIND_PACKAGE(Doxygen)
+#octave or matlab will be used for some test cases
+FIND_PACKAGE(Octave)
+FIND_PACKAGE(Matlab)
 
 #place source files here
 SET(
@@ -145,9 +148,28 @@ SET_TESTS_PROPERTIES(iirfilter PROPERTIES DEPENDS soundfile)
 ADD_TEST(resampling                "musicaccesstests" "resampling")
 SET_TESTS_PROPERTIES(resampling PROPERTIES DEPENDS soundfile)
 
+SET_PROPERTY(DIRECTORY
+        APPEND PROPERTY
+        ADDITIONAL_MAKE_CLEAN_FILES "*.wav")
+
+IF(MATLAB_FOUND)
+    ADD_TEST(fft-wave-matlab                "matlab" "wav2fft.m" "*.wav")
+    SET_TESTS_PROPERTIES(fft-wave-matlab PROPERTIES DEPENDS iirfilter)
+    SET_TESTS_PROPERTIES(fft-wave-matlab PROPERTIES DEPENDS resampling)
+    FILE(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/tests/wav2fft.m DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+ELSE(MATLAB_FOUND)
+    IF(OCTAVE_FOUND)
+        ADD_TEST(fft-wave-octave                ${OCTAVE_EXECUTABLE} "--path" ${CMAKE_CURRENT_BINARY_DIR} "wav2fft.m" "*.wav")
+        SET_TESTS_PROPERTIES(fft-wave-octave PROPERTIES DEPENDS iirfilter)
+        SET_TESTS_PROPERTIES(fft-wave-octave PROPERTIES DEPENDS resampling)
+        FILE(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/tests/wav2fft.m DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+    ENDIF(OCTAVE_FOUND)
+ENDIF(MATLAB_FOUND)
+
 ADD_EXECUTABLE(musicaccesstests
     ${musicaccess_TEST_SOURCES}
     )
+
 #tell the linker which libs need to be linked
 TARGET_LINK_LIBRARIES(musicaccesstests
     ${SNDFILE_LIBRARIES}

@@ -173,18 +173,22 @@ namespace tests
         files.push("sine-8000-22khz.wav");
         files.push("sine-8000-32khz.wav");
         files.push("sine-8000-44khz.wav");
+        files.push("sine-8000-48khz.wav");
         
         files.push("sine-8900-22khz.wav");
         files.push("sine-8900-32khz.wav");
         files.push("sine-8900-44khz.wav");
+        files.push("sine-8900-48khz.wav");
         
         files.push("sine-9000-22khz.wav");
         files.push("sine-9000-32khz.wav");
         files.push("sine-9000-44khz.wav");
+        files.push("sine-9000-48khz.wav");
         
         files.push("sine-9900-22khz.wav");
         files.push("sine-9900-32khz.wav");
         files.push("sine-9900-44khz.wav");
+        files.push("sine-9900-48khz.wav");
         
         //do some batch resampling
         SoundFile soundfile;
@@ -199,7 +203,7 @@ namespace tests
             CHECK(soundfile.getSampleCount() > 0);
             CHECK_EQ(soundfile.getChannelCount(), 1);
             CHECK_OP(soundfile.getSampleRate(), >=, 22050);
-            CHECK_OP(soundfile.getSampleRate(), <=, 44100);
+            CHECK_OP(soundfile.getSampleRate(), <=, 48000);
             
             if (buffer)
                 delete[] buffer;
@@ -379,18 +383,22 @@ namespace tests
         files.push("sine-8000-22khz.wav");
         files.push("sine-8000-32khz.wav");
         files.push("sine-8000-44khz.wav");
+        files.push("sine-8000-48khz.wav");
         
         files.push("sine-8900-22khz.wav");
         files.push("sine-8900-32khz.wav");
         files.push("sine-8900-44khz.wav");
+        files.push("sine-8900-48khz.wav");
         
         files.push("sine-9000-22khz.wav");
         files.push("sine-9000-32khz.wav");
         files.push("sine-9000-44khz.wav");
+        files.push("sine-9000-48khz.wav");
         
         files.push("sine-9900-22khz.wav");
         files.push("sine-9900-32khz.wav");
         files.push("sine-9900-44khz.wav");
+        files.push("sine-9900-48khz.wav");
         
         delete lowpassFilter;
         lowpassFilter = NULL;
@@ -409,7 +417,7 @@ namespace tests
             CHECK(soundfile.getSampleCount() > 0);
             CHECK_EQ(soundfile.getChannelCount(), 1);
             CHECK_OP(soundfile.getSampleRate(), >=, 22050);
-            CHECK_OP(soundfile.getSampleRate(), <=, 44100);
+            CHECK_OP(soundfile.getSampleRate(), <=, 48000);
             
             if (buffer)
                 delete[] buffer;
