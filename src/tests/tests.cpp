@@ -11,6 +11,8 @@
 //for memcpy
 #include <cstring>
 
+#include <queue>
+
 #include "sndfile.h"
 
 namespace tests
@@ -139,7 +141,7 @@ namespace tests
         sf_close(sndfileHandle);
         
         //file.open("./testdata/test-32khz.mp3");
-        file.open("./testdata/sine-9000.wav");
+        file.open("./testdata/sine-9000-32khz.wav");
         delete[] buffer;
         buffer = NULL;
         sampleCount = file.getSampleCount();
@@ -311,6 +313,66 @@ namespace tests
         
         //testing works somehow manual. this is not optimal, but I don't
         //have anything better for now.
+        
+        std::cerr << "testing now with different sample rates and different sine waves..." << std::endl;
+        std::queue<std::string> files;
+        files.push("sine-8000-22khz.wav");
+        files.push("sine-8000-32khz.wav");
+        files.push("sine-8000-44khz.wav");
+        
+        files.push("sine-8900-22khz.wav");
+        files.push("sine-8900-32khz.wav");
+        files.push("sine-8900-44khz.wav");
+        
+        files.push("sine-9000-22khz.wav");
+        files.push("sine-9000-32khz.wav");
+        files.push("sine-9000-44khz.wav");
+        
+        files.push("sine-9900-22khz.wav");
+        files.push("sine-9900-32khz.wav");
+        files.push("sine-9900-44khz.wav");
+        
+        delete lowpassFilter;
+        lowpassFilter = NULL;
+        file.close();
+        
+        SoundFile soundfile;
+        
+        while (!files.empty())
+        {
+            std::string filename = files.front();
+            files.pop();
+            
+            std::cerr << "applying filter to file \"" << std::string("./testdata/") + filename << "\"..." << std::endl;
+            CHECK(soundfile.open(std::string("./testdata/") + filename));
+            
+            CHECK(soundfile.getSampleCount() > 0);
+            CHECK_EQ(soundfile.getChannelCount(), 1);
+            CHECK(soundfile.getSampleRate() >= 22050);
+            CHECK(soundfile.getSampleRate() <= 44100);
+            
+            if (!buffer)
+                delete[] buffer;
+            buffer = new int16_t[soundfile.getSampleCount()];
+            soundfile.readSamples(buffer, soundfile.getSampleCount());
+            
+            std::cerr << "applying low-pass filter..." << std::endl;
+            if(!lowpassFilter)
+                delete lowpassFilter;
+            lowpassFilter = IIRFilter::createLowpassFilter(11025, soundfile.getSampleRate());
+            lowpassFilter->apply(buffer, soundfile.getSampleCount());
+            
+            //write our filtered data to disk
+            SF_INFO sfinfo;
+            sfinfo.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
+            sfinfo.samplerate = soundfile.getSampleRate();
+            sfinfo.channels = 1;
+            
+            SNDFILE* sndfileHandle = sf_open((std::string("./filtered-") + filename).c_str(), SFM_WRITE, &sfinfo);
+            sf_writef_short(sndfileHandle, buffer, soundfile.getSampleCount());
+            sf_close(sndfileHandle);
+            soundfile.close();
+        }
         
         return EXIT_SUCCESS;
     }

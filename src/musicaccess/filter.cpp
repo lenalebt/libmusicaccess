@@ -151,29 +151,29 @@ IIRFilter* IIRFilter::createLowpassFilter(uint32_t cutoffFreq, uint32_t sampleFr
         {
             filter->A=11;
             filter->a[0] =                  1;  
-            filter->a[1] =   9.00294974441401;
-            filter->a[2] =   36.6942073406543;
-            filter->a[3] =   89.1469195728968;
-            filter->a[4] =   142.941542555843;
-            filter->a[5] =   158.041090321997;
-            filter->a[6] =   122.007007238357;
-            filter->a[7] =   64.9328261936864;
-            filter->a[8] =   22.7979812493626;
-            filter->a[9] =   4.76798483459591;
-            filter->a[10] = 0.451032474144709;
+            filter->a[1] =   6.93783549378593;
+            filter->a[2] =   22.7002061923916;
+            filter->a[3] =   45.8668140692342;
+            filter->a[4] =   63.1430995529268;
+            filter->a[5] =   61.7237576962285;
+            filter->a[6] =   43.3075307725539;
+            filter->a[7] =   21.5077027590556;
+            filter->a[8] =   7.22917564654208;
+            filter->a[9] =   1.48427888312467;
+            filter->a[10] = 0.141339199632805;
             
             filter->B=11;
-            filter->b[0] =   0.6715895131289;
-            filter->b[1] =  6.57291943950069;
-            filter->b[2] =  29.0883921644318;
-            filter->b[3] =  76.6511141220782;
-            filter->b[4] =  133.185903705436;
-            filter->b[5] =  159.443703636803;
-            filter->b[6] =  133.185903705436;
-            filter->b[7] =  76.6511141220782;
-            filter->b[8] =  29.0883921644318;
-            filter->b[9] =   6.5729194395007;
-            filter->b[10] =  0.6715895131289;
+            filter->b[0] =  0.375951060155338;
+            filter->b[1] =   3.27817535346175;
+            filter->b[2] =   13.2847792568461;
+            filter->b[3] =   32.9019922878815;
+            filter->b[4] =   55.0997123583028;
+            filter->b[5] =   65.1605196321815;
+            filter->b[6] =   55.0997123583028;
+            filter->b[7] =   32.9019922878816;
+            filter->b[8] =   13.2847792568461;
+            filter->b[9] =   3.27817535346176;
+            filter->b[10] = 0.375951060155338;
             break;
         }
         default:
@@ -215,14 +215,14 @@ void IIRFilter::apply(int16_t* buffer, int bufferSize)
         history[historyPos] = buffer[i];
         
         double tmpVal=0.0;
+        for (int l = 1; l < A; l++)
+        {
+            tmpVal -= a[l] * ((i-l<0) ? 0.0 : buffer[i - l]);
+        }
         for (int k = 0; k < B; k++)
         {
             //this is b[k] * x[i-k], written in terms of the history of our 1024 most recent input samples
             tmpVal += b[k] * history[(historyPos - k + 64) % 64];
-        }
-        for (int l = 1; l < A; l++)
-        {
-            tmpVal -= a[l] * ((i-l<0) ? 0.0 : buffer[i - l]);
         }
         buffer[i] = int16_t(std::floor(tmpVal+0.5));
     }
