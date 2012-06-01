@@ -15,7 +15,7 @@
     //Implementation 0 is without any optimizations
     double sinc(double x)
     {
-        if (x==0)
+        if (x==0.0)
             return 1.0;
         
         x *= M_PI;
