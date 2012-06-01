@@ -23,7 +23,8 @@ namespace musicaccess
      * @endcode
      * 
      * 
-     * @bug Currently only works for 44100kHz source formats.
+     * @bug Currently only works for 44100Hz source formats. 22050Hz works
+     *      more or less, 32000Hz and 48000Hz are not working properly!
      * 
      * @author Lena Brueder
      * @date 2012-05-21
