@@ -146,34 +146,24 @@ IIRFilter* IIRFilter::createLowpassFilter(uint32_t cutoffFreq, uint32_t sampleFr
             filter->b[10] =0.202990136426642;
             break;
         }
-        //[B, A] = cheby2(10, 30, 20000/22050)
+        //[B, A] = cheby2(5, 30, 20000/22050)   //cheby(10, ..., ...) is instable, algorithm is not robust
         case 22050:
         {
-            filter->A=11;
-            filter->a[0] =                  1;  
-            filter->a[1] =   6.93783549378593;
-            filter->a[2] =   22.7002061923916;
-            filter->a[3] =   45.8668140692342;
-            filter->a[4] =   63.1430995529268;
-            filter->a[5] =   61.7237576962285;
-            filter->a[6] =   43.3075307725539;
-            filter->a[7] =   21.5077027590556;
-            filter->a[8] =   7.22917564654208;
-            filter->a[9] =   1.48427888312467;
-            filter->a[10] = 0.141339199632805;
+            filter->A=6;
+            filter->a[0] =                   1;  
+            filter->a[1] =    4.03564269726031;
+            filter->a[2] =    6.66166416557488;
+            filter->a[3] =    5.60468638076015;
+            filter->a[4] =    2.39840891620998;
+            filter->a[5] =   0.417008263528028;
             
-            filter->B=11;
-            filter->b[0] =  0.375951060155338;
-            filter->b[1] =   3.27817535346175;
-            filter->b[2] =   13.2847792568461;
-            filter->b[3] =   32.9019922878815;
-            filter->b[4] =   55.0997123583028;
-            filter->b[5] =   65.1605196321815;
-            filter->b[6] =   55.0997123583028;
-            filter->b[7] =   32.9019922878816;
-            filter->b[8] =   13.2847792568461;
-            filter->b[9] =   3.27817535346176;
-            filter->b[10] = 0.375951060155338;
+            filter->B=6;
+            filter->b[0] =  0.645761775608381;
+            filter->b[1] =   3.16007028495949;
+            filter->b[2] =    6.2528731510988;
+            filter->b[3] =    6.2528731510988;
+            filter->b[4] =   3.16007028495949;
+            filter->b[5] =  0.645761775608381;
             break;
         }
         default:
@@ -217,13 +207,13 @@ void IIRFilter::apply(int16_t* buffer, int bufferSize)
         double tmpVal=0.0;
         for (int l = 1; l < A; l++)
         {
-            tmpVal -= a[l] * ((i-l<0) ? 0.0 : buffer[i - l]);
+            tmpVal -= a[l] * ((i-l<0) ? 0.0 : (double(buffer[i - l])/65536.0));
         }
         for (int k = 0; k < B; k++)
         {
             //this is b[k] * x[i-k], written in terms of the history of our 1024 most recent input samples
-            tmpVal += b[k] * history[(historyPos - k + 64) % 64];
+            tmpVal += b[k] * (double(history[(historyPos - k + 64) % 64])/65536.0);
         }
-        buffer[i] = int16_t(std::floor(tmpVal+0.5));
+        buffer[i] = int16_t(std::floor(tmpVal*65536.0+0.5));
     }
 }

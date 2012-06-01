@@ -141,7 +141,7 @@ namespace tests
         sf_close(sndfileHandle);
         
         //file.open("./testdata/test-32khz.mp3");
-        file.open("./testdata/sine-9000-32khz.wav");
+        file.open("./testdata/sine-9000-32khz-long.wav");
         delete[] buffer;
         buffer = NULL;
         sampleCount = file.getSampleCount();
@@ -150,7 +150,9 @@ namespace tests
         CHECK(buffer != NULL);
         file.readSamples(buffer, sampleCount);
         
+        std::cerr << "now resampling..." << std::endl;
         resampler.resample(file.getSampleRate(), &buffer, sampleCount, file.getChannelCount());
+        std::cerr << "resampled..." << std::endl;
         
         //we need to have less samples. better check see below.
         //CHECK(sampleCount < oldSampleCount);
