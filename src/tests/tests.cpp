@@ -15,6 +15,8 @@
 
 #include "sndfile.h"
 
+using namespace musicaccess;
+
 namespace tests
 {
     int testEndsWith()
@@ -140,8 +142,8 @@ namespace tests
         sf_writef_short(sndfileHandle, buffer, sampleCount);
         sf_close(sndfileHandle);
         
-        //file.open("./testdata/test-32khz.mp3");
-        file.open("./testdata/sine-9000-32khz-long.wav");
+        file.open("./testdata/test-32khz.mp3");
+        //file.open("./testdata/sine-9000-32khz-long.wav");
         delete[] buffer;
         buffer = NULL;
         sampleCount = file.getSampleCount();
@@ -161,7 +163,7 @@ namespace tests
         
         //write our filtered data to disk
         sfinfo.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
-        sfinfo.samplerate = 32000;
+        sfinfo.samplerate = 22050;
         sfinfo.channels = 1;
         
         sndfileHandle = sf_open("./test-resampled-from32khz-22khz-mono.wav", SFM_WRITE, &sfinfo);
