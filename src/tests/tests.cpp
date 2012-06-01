@@ -408,8 +408,8 @@ namespace tests
             
             CHECK(soundfile.getSampleCount() > 0);
             CHECK_EQ(soundfile.getChannelCount(), 1);
-            CHECK(soundfile.getSampleRate() >= 22050);
-            CHECK(soundfile.getSampleRate() <= 44100);
+            CHECK_OP(soundfile.getSampleRate(), >=, 22050);
+            CHECK_OP(soundfile.getSampleRate(), <=, 44100);
             
             if (buffer)
                 delete[] buffer;
