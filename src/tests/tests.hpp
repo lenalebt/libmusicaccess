@@ -7,6 +7,7 @@ namespace tests
     int testSoundFile();
     int testResampling();
     int testIIRFilter();
+    int testSortingIIRFilter();
 }
 
 #endif //TESTS_HPP

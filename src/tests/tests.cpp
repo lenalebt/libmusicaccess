@@ -450,4 +450,243 @@ namespace tests
         
         return EXIT_SUCCESS;
     }
+    
+    int testSortingIIRFilter()
+    {
+        SoundFile file;
+        file.open("./testdata/test.mp3");
+        int16_t* buffer = NULL;
+        int16_t* buffer2 = NULL;
+        
+        CHECK_EQ(file.getSampleCount(), 1424384u);
+        
+        buffer = new int16_t[file.getSampleCount()];
+        CHECK(buffer != NULL);
+        int monoSampleCount = file.getSampleCount()/2;
+        buffer2 = new int16_t[monoSampleCount];
+        CHECK(buffer2 != NULL);
+        file.readSamples(buffer, file.getSampleCount());
+        
+        std::cerr << "converting file to mono..." << std::endl;
+        for(int i=0; i< file.getSampleCount(); i+=2)
+        {
+            buffer2[i/2] = (int32_t(buffer[i]) + int32_t(buffer[i+1])) / 2;
+        }
+        delete[] buffer;
+        buffer = NULL;
+        buffer = new int16_t[monoSampleCount];
+        CHECK(buffer != NULL);
+        memcpy(buffer, buffer2, monoSampleCount*sizeof(int16_t));
+        bool arraysAreEqual=true;
+        CHECK(buffer != buffer2);
+        
+        std::cerr << "openend ./testdata/test.mp3 and copied the samples to another array." << std::endl;
+        for (int i = 0; i < monoSampleCount; i++)
+        {
+            arraysAreEqual = arraysAreEqual && (buffer[i] == buffer2[i]);
+        }
+        CHECK(arraysAreEqual);
+        CHECK(buffer != buffer2);
+        
+        std::cerr << "applying noop-filter and checking for arrays still being equal..." << std::endl;
+        IIRFilter* noopFilter = NULL;
+        noopFilter = IIRFilter::createNOOPFilter();
+        CHECK(noopFilter != NULL);
+        SortingIIRFilter* sortingNoopFilter = NULL;
+        sortingNoopFilter = SortingIIRFilter::createFilter(*noopFilter);
+        CHECK(sortingNoopFilter != NULL);
+        delete noopFilter;
+        noopFilter = NULL;
+        
+        sortingNoopFilter->apply(buffer, monoSampleCount);
+        
+        for (int i = 0; i < monoSampleCount; i++)
+        {
+            arraysAreEqual = arraysAreEqual && (buffer[i] == buffer2[i]);
+            if (!arraysAreEqual)
+            {
+                std::cerr << "i=" << i << std::endl;
+                CHECK_EQ(buffer[i], buffer2[i]);
+            }
+        }
+        CHECK(arraysAreEqual);
+        CHECK(buffer != buffer2);
+        
+        delete sortingNoopFilter;
+        sortingNoopFilter = NULL;
+        
+        
+        std::cerr << "applying lowpass-filter..." << std::endl;
+        IIRFilter* lowpassFilter = NULL;
+        lowpassFilter = IIRFilter::createLowpassFilter(11025, file.getSampleRate());
+        CHECK(lowpassFilter != NULL);
+        SortingIIRFilter* sortingLowpassFilter = NULL;
+        sortingLowpassFilter = SortingIIRFilter::createFilter(*lowpassFilter);
+        CHECK(sortingLowpassFilter != NULL);
+        delete lowpassFilter;
+        lowpassFilter = NULL;
+        
+        sortingLowpassFilter->apply(buffer, monoSampleCount);
+        
+        for (int i = 0; i < monoSampleCount; i++)
+        {
+            arraysAreEqual = arraysAreEqual && (buffer[i] == buffer2[i]);
+        }
+        CHECK(!arraysAreEqual);
+        
+        //okay, we know that our filter did "something".
+        
+        
+        //write our filtered data to disk
+        SF_INFO sfinfo;
+        sfinfo.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
+        sfinfo.samplerate = 44100;
+        sfinfo.channels = 1;
+        
+        SNDFILE* sndfileHandle = sf_open("./test-sortingiirfilter-filtered.wav", SFM_WRITE, &sfinfo);
+        sf_writef_short(sndfileHandle, buffer, monoSampleCount);
+        sf_close(sndfileHandle);
+        
+        
+        std::cerr << "reading 32khz file..." << std::endl;
+        file.open("./testdata/test-32khz.mp3");
+        //file.open("./testdata/sine-9900.mp3");
+        delete[] buffer;
+        buffer = NULL;
+        int sampleCount = file.getSampleCount();
+        buffer = new int16_t[sampleCount];
+        CHECK(buffer != NULL);
+        file.readSamples(buffer, sampleCount);
+        
+        if (file.getChannelCount() == 2)
+        {
+            std::cerr << "converting file to mono..." << std::endl;
+            monoSampleCount = file.getSampleCount()/2;
+            buffer2 = new int16_t[monoSampleCount];
+            CHECK(buffer2 != NULL);
+            for(int i=0; i< file.getSampleCount(); i+=2)
+            {
+                buffer2[i/2] = (int32_t(buffer[i]) + int32_t(buffer[i+1])) / 2;
+            }
+            delete[] buffer;
+            buffer = NULL;
+            buffer = new int16_t[monoSampleCount];
+            CHECK(buffer != NULL);
+            memcpy(buffer, buffer2, monoSampleCount*sizeof(int16_t));
+            arraysAreEqual=true;
+            CHECK(buffer != buffer2);
+        }
+        else
+        {
+            monoSampleCount = sampleCount;
+        }
+        
+        std::cerr << "applying filter to 32khz signal..." << std::endl;
+        IIRFilter* lowpassFilter2 = NULL;
+        lowpassFilter2 = IIRFilter::createLowpassFilter(11025, file.getSampleRate());
+        CHECK(lowpassFilter2 != NULL);
+        SortingIIRFilter* sortingLowpassFilter2 = NULL;
+        sortingLowpassFilter2 = SortingIIRFilter::createFilter(*lowpassFilter2);
+        CHECK(sortingLowpassFilter2 != NULL);
+        delete lowpassFilter2;
+        lowpassFilter2 = NULL;
+        
+        sortingLowpassFilter2->apply(buffer, monoSampleCount);
+        
+        for (int i = 0; i < monoSampleCount; i++)
+        {
+            arraysAreEqual = arraysAreEqual && (buffer[i] == buffer2[i]);
+        }
+        CHECK(!arraysAreEqual);
+        
+        //okay, we know that our filter did "something".
+        
+        
+        //write our filtered data to disk
+        sfinfo.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
+        sfinfo.samplerate = 32000;
+        sfinfo.channels = 1;
+        
+        sndfileHandle = sf_open("./test-sortingiirfilter-filtered-32khz.wav", SFM_WRITE, &sfinfo);
+        sf_writef_short(sndfileHandle, buffer, monoSampleCount);
+        sf_close(sndfileHandle);
+        
+        //testing works somehow manual. this is not optimal, but I don't
+        //have anything better for now.
+        
+        std::cerr << "testing now with different sample rates and different sine waves..." << std::endl;
+        std::queue<std::string> files;
+        files.push("sine-8000-22khz.wav");
+        files.push("sine-8000-32khz.wav");
+        files.push("sine-8000-44khz.wav");
+        files.push("sine-8000-48khz.wav");
+        
+        files.push("sine-8900-22khz.wav");
+        files.push("sine-8900-32khz.wav");
+        files.push("sine-8900-44khz.wav");
+        files.push("sine-8900-48khz.wav");
+        
+        files.push("sine-9000-22khz.wav");
+        files.push("sine-9000-32khz.wav");
+        files.push("sine-9000-44khz.wav");
+        files.push("sine-9000-48khz.wav");
+        
+        files.push("sine-9900-22khz.wav");
+        files.push("sine-9900-32khz.wav");
+        files.push("sine-9900-44khz.wav");
+        files.push("sine-9900-48khz.wav");
+        
+        delete sortingLowpassFilter;
+        sortingLowpassFilter = NULL;
+        delete lowpassFilter;
+        lowpassFilter = NULL;
+        file.close();
+        
+        SoundFile soundfile;
+        
+        while (!files.empty())
+        {
+            std::string filename = files.front();
+            files.pop();
+            
+            std::cerr << "applying filter to file \"" << std::string("./testdata/") + filename << "\"..." << std::endl;
+            CHECK(soundfile.open(std::string("./testdata/") + filename));
+            
+            CHECK(soundfile.getSampleCount() > 0);
+            CHECK_EQ(soundfile.getChannelCount(), 1);
+            CHECK_OP(soundfile.getSampleRate(), >=, 22050);
+            CHECK_OP(soundfile.getSampleRate(), <=, 48000);
+            
+            if (buffer)
+                delete[] buffer;
+            buffer = new int16_t[soundfile.getSampleCount()];
+            soundfile.readSamples(buffer, soundfile.getSampleCount());
+            
+            std::cerr << "applying low-pass filter..." << std::endl;
+            if(sortingLowpassFilter)
+                delete sortingLowpassFilter;
+            if(lowpassFilter)
+                delete lowpassFilter;
+            lowpassFilter = IIRFilter::createLowpassFilter(11025, soundfile.getSampleRate());
+            sortingLowpassFilter = SortingIIRFilter::createFilter(*lowpassFilter);
+            sortingLowpassFilter->apply(buffer, soundfile.getSampleCount());
+            
+            //TODO: Do some checks.
+            std::cerr << "need to manually check these files if they are correct...: \""
+                << "./sortfiltered-" << filename << "\"" << std::endl;
+            
+            //write our filtered data to disk
+            SF_INFO sfinfo;
+            sfinfo.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
+            sfinfo.samplerate = soundfile.getSampleRate();
+            sfinfo.channels = 1;
+            
+            SNDFILE* sndfileHandle = sf_open((std::string("./sortfiltered-") + filename).c_str(), SFM_WRITE, &sfinfo);
+            sf_writef_short(sndfileHandle, buffer, soundfile.getSampleCount());
+            sf_close(sndfileHandle);
+            soundfile.close();
+        }
+        
+        return EXIT_SUCCESS;
+    }
 }
