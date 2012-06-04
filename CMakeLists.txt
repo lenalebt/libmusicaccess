@@ -156,7 +156,10 @@ SET_PROPERTY(DIRECTORY
 
 IF(MATLAB_FOUND)
     ADD_TEST(fft-iirfilter-matlab                 "matlab" "wav2fft.m" "filtered*.wav")
+<<<<<<< HEAD
     ADD_TEST(fft-sortingiirfilter-matlab          "matlab" "wav2fft.m" "sortfiltered*.wav")
+=======
+>>>>>>> 12cac2b0a7dc52d0705e80e973eb570fe0413e38
     ADD_TEST(fft-resampling-matlab                "matlab" "wav2fft.m" "resampled*.wav")
     SET_TESTS_PROPERTIES(fft-iirfilter-matlab PROPERTIES DEPENDS iirfilter)
     SET_TESTS_PROPERTIES(fft-resampling-matlab PROPERTIES DEPENDS resampling)
@@ -164,8 +167,12 @@ IF(MATLAB_FOUND)
 ELSE(MATLAB_FOUND)
     IF(OCTAVE_FOUND)
         ADD_TEST(fft-iirfilter-octave                ${OCTAVE_EXECUTABLE} "--path" ${CMAKE_CURRENT_BINARY_DIR} "wav2fft.m" "filtered*.wav")
+<<<<<<< HEAD
         ADD_TEST(fft-sortingiirfilter-octave         ${OCTAVE_EXECUTABLE} "--path" ${CMAKE_CURRENT_BINARY_DIR} "wav2fft.m" "sortfiltered*.wav")
         ADD_TEST(fft-resampling-octave               ${OCTAVE_EXECUTABLE} "--path" ${CMAKE_CURRENT_BINARY_DIR} "wav2fft.m" "resampled*.wav")
+=======
+        ADD_TEST(fft-resampling-octave                ${OCTAVE_EXECUTABLE} "--path" ${CMAKE_CURRENT_BINARY_DIR} "wav2fft.m" "resampled*.wav")
+>>>>>>> 12cac2b0a7dc52d0705e80e973eb570fe0413e38
         SET_TESTS_PROPERTIES(fft-iirfilter-octave PROPERTIES DEPENDS iirfilter)
         SET_TESTS_PROPERTIES(fft-resampling-octave PROPERTIES DEPENDS resampling)
         FILE(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/tests/wav2fft.m DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
