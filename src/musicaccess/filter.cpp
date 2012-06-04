@@ -386,8 +386,6 @@ namespace musicaccess
             }
             buffer[i] = int16_t(std::floor(tmpVal+0.5));
         }
-        
-        return filter;
     }
     bool SortingIIRFilter::pairFirstElementComparator(const std::pair<iirfilter_coefficienttype, int>& a, const std::pair<iirfilter_coefficienttype, int>& b)
     {
