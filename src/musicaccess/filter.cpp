@@ -342,8 +342,8 @@ namespace musicaccess
             }
             for (int k = 0; k < B; k++)
             {
-                //this is b[k] * x[i-k], written in terms of the history of our 1024 most recent input samples
-                tmpVal += b[k] * (iirfilter_coefficienttype(history[(historyPos - k + 64) % 64]));
+                //this is b[k] * x[i-k], written in terms of the history of our MUSICACCESS_IIRFILTER_COEFFICIENTCOUNT most recent input samples
+                tmpVal += b[k] * (iirfilter_coefficienttype(history[(historyPos - k + MUSICACCESS_IIRFILTER_COEFFICIENTCOUNT) % MUSICACCESS_IIRFILTER_COEFFICIENTCOUNT]));
             }
             buffer[i] = int16_t(std::floor(tmpVal+0.5));
         }
@@ -381,8 +381,8 @@ namespace musicaccess
             }
             for (int k = 0; k < B; k++)
             {
-                //this is b[k] * x[i-k], written in terms of the history of our 1024 most recent input samples
-                tmpVal += b[bOrder[k]] * (iirfilter_coefficienttype(history[(historyPos - bOrder[k] + 64) % 64]));
+                //this is b[k] * x[i-k], written in terms of the history of our MUSICACCESS_IIRFILTER_COEFFICIENTCOUNT most recent input samples
+                tmpVal += b[bOrder[k]] * (iirfilter_coefficienttype(history[(historyPos - bOrder[k] + MUSICACCESS_IIRFILTER_COEFFICIENTCOUNT) % MUSICACCESS_IIRFILTER_COEFFICIENTCOUNT]));
             }
             buffer[i] = int16_t(std::floor(tmpVal+0.5));
         }
