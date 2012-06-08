@@ -6,7 +6,8 @@
 namespace musicaccess
 {
 
-    float sinc(float x);
+    //float sinc(float x);
+    //float window(int width, int position);
 
 
     /**

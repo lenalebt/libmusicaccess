@@ -16,6 +16,24 @@ namespace musicaccess
         
     }
 
+    IIRFilter* IIRFilter::createLowpassFilter(float relativeCutoff)
+    {
+        if (11025.0/22050.0 < relativeCutoff)
+            return createLowpassFilter(11025, 22050);
+        else if (11025.0/32000.0 < relativeCutoff)
+            return createLowpassFilter(11025, 32000);
+        else if (11025.0/44100.0 < relativeCutoff)
+            return createLowpassFilter(11025, 44100);
+        else if (11025.0/48000.0 < relativeCutoff)
+            return createLowpassFilter(11025, 48000);
+        else if (11025.0/88200.0 < relativeCutoff)
+            return createLowpassFilter(11025, 88200);
+        else if (11025.0/96000.0 < relativeCutoff)
+            return createLowpassFilter(11025, 96000);
+        else
+            return NULL;
+    }
+
     IIRFilter* IIRFilter::createLowpassFilter(uint32_t cutoffFreq, uint32_t sampleFreq)
     {
         if (cutoffFreq != 11025)

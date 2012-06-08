@@ -70,11 +70,28 @@ namespace musicaccess
          * 
          * This function only works for some standard sample rates (22050, 32000,
          * 44100, 48000 and 96000Hz) and cutoff frequency 11025Hz, and creates a Chebyshev
-         * filter of order 10.
+         * filter of order 10 or a Butterworth filter of order 6 - that depends on the
+         * IIR_FILTER_IMPLEMENTATION compile time flag (currently to be set by hand in
+         * the implementation file).
          * 
          * @return an IIR filter that does lowpass filtering.
          */
         static IIRFilter* createLowpassFilter(uint32_t cutoffFreq, uint32_t sampleFreq);
+        
+        /**
+         * @brief Creates a lowpass filter with given cutoff frequency relative to the
+         *  sample rate.
+         * 
+         * This function uses precomputed filter coefficients. It always uses the
+         * best-fitting coefficients which hold the relative cutoff
+         * constraint. This might lead to more frequencies being cut off than
+         * necessary.
+         * 
+         * @remarks This function might create a filter that cuts more than was needed.
+         * 
+         * @return an IIR filter that does lowpass filtering.
+         */
+        static IIRFilter* createLowpassFilter(float relativeCutoff);
         /**
          * @brief Creates a IIR filter that exactly does nothing.
          * 
