@@ -54,6 +54,8 @@ namespace musicaccess
         
         bool fileOpen;
         
+        bool decodeToFloat;
+        
         SOUNDFILE_DATATYPE dataType;
         
         mpg123_handle* mpg123Handle;
@@ -96,7 +98,7 @@ namespace musicaccess
          * @param filename The filename you want to open.
          * @return <code>true</code>, if opening the file was successful, <code>false</code> otherwise.
          */
-        bool open(const std::string&);
+        bool open(const std::string&, bool decodeToFloat=false);
         
         /**
          * @brief Closes an opened music file.
@@ -169,7 +171,7 @@ namespace musicaccess
         uint32_t getPosition() {return position;}
         
         /**
-         * @brief Returns the next samples, formatted as float.
+         * @brief Returns the next samples, formatted as int16_t.
          * 
          * This functions writes the next <code>count</code> samples to the
          * supplied blockAddress. it will not take care of how the samples are
@@ -185,6 +187,24 @@ namespace musicaccess
          * @return the sample count that actually was read
          */
         size_t readSamples(int16_t* buffer, int count);
+        
+        /**
+         * @brief Returns the next samples, formatted as float.
+         * 
+         * This functions writes the next <code>count</code> samples to the
+         * supplied blockAddress. it will not take care of how the samples are
+         * arranged, so you have to take care of that for yourself.
+         * 
+         * @param buffer The buffer where to save the data. You have to make
+         *      sure that there is enough memory to write to.
+         * @param count The sample count that should be read.
+         * @remarks If no file has been opened, the return value is undefined.
+         * @remarks This function will return 16bit integers, regardless of the input
+         *      format. Take a look at getSampleSize() to see what resolution the samples
+         *      have.
+         * @return the sample count that actually was read
+         */
+        size_t readSamples(float* buffer, int count);
 
     };
 }
