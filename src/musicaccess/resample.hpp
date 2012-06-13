@@ -74,6 +74,24 @@ namespace musicaccess
          *      be unsuccessful on not having enough memory.
          */
         bool downsample(int16_t** samplePtr, int& sampleCount, unsigned int n);
+        /**
+         * @brief Takes the given sound samples and uses every nth of it to build a new array.
+         * 
+         * Usage:
+         * @code
+         * int sampleCount = 500;
+         * float* samples = new float[sampleCount];
+         * downsample(&samples, sampleCount, 2);
+         * //samples now has 250 samples. you can see the decreased value in sampleCount.
+         * @endcode
+         * 
+         * @param samplePtr input/output buffer. Use an array on the heap and pass its address to the function.
+         * @param sampleCount the sample count of *samplePtr. Will output the new sample count, too.
+         * @param n every nth sample will be taken to build the new array
+         * @return if the operation was successful, or not. The operation may
+         *      be unsuccessful on not having enough memory.
+         */
+        bool downsample(float** samplePtr, int& sampleCount, unsigned int n);
     public:
         /**
          * @brief Does resampling to 22.05kHz, 16bit, mono.
@@ -94,6 +112,25 @@ namespace musicaccess
          *      be unsuccessful on not having enough memory.
          */
         bool resample(uint32_t fromSampleRate, int16_t** samplePtr, int& sampleCount, unsigned int channelCount);
+        /**
+         * @brief Does resampling to 22.05kHz, 32bit_float, mono.
+         * 
+         * This function first converts from any channel count to mono
+         * through calculating the arithmetic mean of the corresponding samples.
+         * Then, a low pass filter is applied to the input signal, and
+         * up-/downsampling takes place.
+         * 
+         * @param fromSampleRate the sample rate of the input signal.
+         * @param samplePtr this is input and output at the same time. Since
+         *      you will much likely not get the same sample count out of the function,
+         *      you will get another memory address.
+         * @param sampleCount reads in the current sample count and outputs the new sample count
+         *      of the new, resampled data.
+         * @param channelCount the channel count of the input data.
+         * @return if the operation was successful, or not. The operation may
+         *      be unsuccessful on not having enough memory.
+         */
+        bool resample(uint32_t fromSampleRate, float** samplePtr, int& sampleCount, unsigned int channelCount);
     };
 }
 

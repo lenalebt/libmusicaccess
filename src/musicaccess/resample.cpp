@@ -307,6 +307,25 @@ namespace musicaccess
         
         return true;
     }
+    bool Resampler22kHzMono::downsample(float** samplePtr, int& sampleCount, unsigned int factor)
+    {
+        //use sampleCount / factor samples
+        sampleCount /= factor;
+        
+        float* newSamples = NULL;
+        newSamples = new float[sampleCount];
+        if (!newSamples)    //failed to get memory
+            return false;
+        for (int i=0; i<sampleCount; i++)
+        {
+            //use every nth sample
+            newSamples[i] = (*samplePtr)[i*factor];
+        }
+        delete[] *samplePtr;
+        *samplePtr = newSamples;
+        
+        return true;
+    }
 
     bool Resampler22kHzMono::resample(uint32_t fromSampleRate, int16_t** samplePtr, int& sampleCount, unsigned int channelCount)
     {
@@ -374,6 +393,77 @@ namespace musicaccess
             downsample(samplePtr, sampleCount, 2);*/
             //resample(samplePtr, sampleCount, fromSampleRate, 22050);
             resample2(samplePtr, sampleCount, fromSampleRate, 22050);
+            //do upsampling, then downsampling.
+        }
+        
+        return true;
+    }
+    bool Resampler22kHzMono::resample(uint32_t fromSampleRate, float** samplePtr, int& sampleCount, unsigned int channelCount)
+    {
+        //first convert to mono - we do not need stereo or more channels.
+        unsigned int frameCount = sampleCount/channelCount;
+        float* monoSamples = new float[frameCount];
+        if (!monoSamples)   //failed to get memory
+            return false;
+        
+        float* samples = *samplePtr;
+        for (unsigned int i = 0; i < frameCount; i++)
+        {
+            int32_t tmpVal = 0;
+            int offset = channelCount * i;
+            for (unsigned int j = 0; j < channelCount; j++)
+            {
+                tmpVal += samples[offset + j];
+            }
+            monoSamples[i] = tmpVal / channelCount;
+        }
+        //should have mono samples now. we can discard the old samples.
+        delete[] samples;
+        samples = NULL;
+        sampleCount = frameCount;
+        *samplePtr = monoSamples;
+        
+        //first, apply low-pass filtering - we need this prior to resampling.
+        IIRFilter* filter = IIRFilter::createLowpassFilter(11025, fromSampleRate);
+        filter->apply(*samplePtr, sampleCount);
+        delete filter;
+        filter=NULL;
+        
+        //write our filtered data to disk
+        SF_INFO sfinfo;
+        sfinfo.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
+        sfinfo.samplerate = fromSampleRate;
+        sfinfo.channels = 1;
+        
+        SNDFILE* sndfileHandle = sf_open("./test-resampling-midway-float.wav", SFM_WRITE, &sfinfo);
+        sf_writef_float(sndfileHandle, *samplePtr, sampleCount);
+        sf_close(sndfileHandle);
+        
+        //if we have an integer factor between sample rates, it is okay to
+        //skip upsampling. this is /way/ faster.
+        if ((fromSampleRate % 22050) == 0)
+        {
+            downsample(samplePtr, sampleCount, fromSampleRate / 22050);
+        }
+        else
+        {
+            //resample(samplePtr, sampleCount, 22050.0 / double(fromSampleRate));
+            /*resample(samplePtr, sampleCount, fromSampleRate, 44100);
+            
+            SF_INFO sfinfo;
+            sfinfo.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
+            sfinfo.samplerate = 44100;
+            sfinfo.channels = 1;
+            
+            SNDFILE* sndfileHandle = sf_open("./test-resampling-midway2.wav", SFM_WRITE, &sfinfo);
+            sf_writef_short(sndfileHandle, *samplePtr, sampleCount);
+            sf_close(sndfileHandle);
+            
+            filter = IIRFilter::createLowpassFilter(11025, 44100);
+            filter->apply(*samplePtr, sampleCount);
+            downsample(samplePtr, sampleCount, 2);*/
+            //resample(samplePtr, sampleCount, fromSampleRate, 22050);
+            //THIS WAS ENABLED//resample2(samplePtr, sampleCount, fromSampleRate, 22050);
             //do upsampling, then downsampling.
         }
         
