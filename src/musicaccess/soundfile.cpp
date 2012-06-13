@@ -193,9 +193,13 @@ namespace musicaccess
         {   //return data from libmpg123
             int error;
             size_t bytesRead;
+            size_t framesRead;
             
             if (!decodeToFloat)
+            {
                 error = mpg123_read( mpg123Handle, (unsigned char*)buffer, count*sampleSize, &bytesRead );
+                framesRead = bytesRead / sampleSize;
+            }
             else
             {
                 //read as float and reformat to int16_t
@@ -206,9 +210,9 @@ namespace musicaccess
                     buffer[i] = 32768.0 * floatBuffer[i];
                 }
                 delete[] floatBuffer;
+                framesRead = bytesRead / sizeof(float);
             }
             
-            size_t framesRead = bytesRead / sampleSize;
             position += framesRead;
             
             if (error == MPG123_DONE)
@@ -244,8 +248,13 @@ namespace musicaccess
         {   //return data from libmpg123
             int error;
             size_t bytesRead;
+            size_t framesRead;
+            
             if (decodeToFloat)
+            {
                 error = mpg123_read( mpg123Handle, (unsigned char*)buffer, count*sampleSize, &bytesRead );
+                framesRead = bytesRead / sampleSize;
+            }
             else
             {
                 //read as int16_t and reformat as float
@@ -256,9 +265,9 @@ namespace musicaccess
                     buffer[i] = float(intBuffer[i]) / 32768.0;
                 }
                 delete[] intBuffer;
+                framesRead = bytesRead / sizeof(int16_t);
             }
             
-            size_t framesRead = bytesRead / sampleSize;
             position += framesRead;
             
             if (error == MPG123_DONE)
