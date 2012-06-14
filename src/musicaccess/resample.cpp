@@ -400,6 +400,7 @@ namespace musicaccess
         delete filter;
         filter=NULL;
         
+        /*
         //write our filtered data to disk
         SF_INFO sfinfo;
         sfinfo.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
@@ -409,6 +410,7 @@ namespace musicaccess
         SNDFILE* sndfileHandle = sf_open("./test-resampling-midway.wav", SFM_WRITE, &sfinfo);
         sf_writef_short(sndfileHandle, *samplePtr, sampleCount);
         sf_close(sndfileHandle);
+        */
         
         //if we have an integer factor between sample rates, it is okay to
         //skip upsampling. this is /way/ faster.
@@ -471,6 +473,7 @@ namespace musicaccess
         delete filter;
         filter=NULL;
         
+        /*
         //write our filtered data to disk
         SF_INFO sfinfo;
         sfinfo.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
@@ -480,6 +483,7 @@ namespace musicaccess
         SNDFILE* sndfileHandle = sf_open("./test-resampling-midway-float.wav", SFM_WRITE, &sfinfo);
         sf_writef_float(sndfileHandle, *samplePtr, sampleCount);
         sf_close(sndfileHandle);
+        */
         
         //if we have an integer factor between sample rates, it is okay to
         //skip upsampling. this is /way/ faster.
