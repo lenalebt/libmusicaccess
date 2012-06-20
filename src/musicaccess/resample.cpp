@@ -353,6 +353,7 @@ namespace musicaccess
     {
         //use sampleCount / factor samples
         sampleCount /= factor;
+        sampleCount--;
         
         float* newSamples = NULL;
         newSamples = new float[sampleCount];

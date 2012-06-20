@@ -25,7 +25,7 @@ namespace musicaccess
         else if (11025.0/32000.0 <= relativeCutoff)
             return createLowpassFilter(11025, 32000);
         else if (11025.0/44100.0 <= relativeCutoff)
-            return createLowpassFilter(11025, 44100);
+            return createLowpassFilter(11025, 44100);   //this one is used by the constant q transform.
         else if (11025.0/48000.0 <= relativeCutoff)
             return createLowpassFilter(11025, 48000);
         else if (11025.0/88200.0 <= relativeCutoff)
