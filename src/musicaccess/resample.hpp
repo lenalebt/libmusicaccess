@@ -53,10 +53,10 @@ namespace musicaccess
          * @return if the operation was successful, or not. The operation may
          *      be unsuccessful on not having enough memory.
          */
-        bool resample(int16_t** samplePtr, int& sampleCount, double factor);
-        bool resample2(int16_t** samplePtr, int& sampleCount, int32_t fromRate, int32_t toRate);
-        bool resample2(float** samplePtr, int& sampleCount, int32_t fromRate, int32_t toRate);
-        bool resample(int16_t** samplePtr, int& sampleCount, int32_t fromRate, int32_t toRate);
+        bool resample(int16_t** samplePtr, int& sampleCount, double factor) const;
+        bool resample2(int16_t** samplePtr, int& sampleCount, int32_t fromRate, int32_t toRate) const;
+        bool resample2(float** samplePtr, int& sampleCount, int32_t fromRate, int32_t toRate) const;
+        bool resample(int16_t** samplePtr, int& sampleCount, int32_t fromRate, int32_t toRate) const;
         /**
          * @brief Takes the given sound samples and uses every nth of it to build a new array.
          * 
@@ -74,7 +74,7 @@ namespace musicaccess
          * @return if the operation was successful, or not. The operation may
          *      be unsuccessful on not having enough memory.
          */
-        bool downsample(int16_t** samplePtr, int& sampleCount, unsigned int n);
+        bool downsample(int16_t** samplePtr, int& sampleCount, unsigned int n) const;
         /**
          * @brief Takes the given sound samples and uses every nth of it to build a new array.
          * 
@@ -92,7 +92,7 @@ namespace musicaccess
          * @return if the operation was successful, or not. The operation may
          *      be unsuccessful on not having enough memory.
          */
-        bool downsample(float** samplePtr, int& sampleCount, unsigned int n);
+        bool downsample(float** samplePtr, int& sampleCount, unsigned int n) const;
     public:
         /**
          * @brief Does resampling to 22.05kHz, 16bit, mono.
@@ -112,7 +112,7 @@ namespace musicaccess
          * @return if the operation was successful, or not. The operation may
          *      be unsuccessful on not having enough memory.
          */
-        bool resample(uint32_t fromSampleRate, int16_t** samplePtr, int& sampleCount, unsigned int channelCount);
+        bool resample(uint32_t fromSampleRate, int16_t** samplePtr, int& sampleCount, unsigned int channelCount) const;
         /**
          * @brief Does resampling to 22.05kHz, 32bit_float, mono.
          * 
@@ -131,7 +131,7 @@ namespace musicaccess
          * @return if the operation was successful, or not. The operation may
          *      be unsuccessful on not having enough memory.
          */
-        bool resample(uint32_t fromSampleRate, float** samplePtr, int& sampleCount, unsigned int channelCount);
+        bool resample(uint32_t fromSampleRate, float** samplePtr, int& sampleCount, unsigned int channelCount) const;
     };
 }
 

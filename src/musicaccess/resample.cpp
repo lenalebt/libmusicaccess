@@ -151,7 +151,7 @@ namespace musicaccess
     }
 
 
-    bool Resampler22kHzMono::resample(int16_t** samplePtr, int& sampleCount, double factor)
+    bool Resampler22kHzMono::resample(int16_t** samplePtr, int& sampleCount, double factor) const
     {
         //use this to speed up for loops, as multiplication is faster than division
         double divisor = 1.0 / factor;
@@ -208,7 +208,7 @@ namespace musicaccess
         
     }
 
-    bool Resampler22kHzMono::resample(int16_t** samplePtr, int& sampleCount, int32_t fromRate, int32_t toRate)
+    bool Resampler22kHzMono::resample(int16_t** samplePtr, int& sampleCount, int32_t fromRate, int32_t toRate) const
     {
         double fs = fromRate;
         double fs_ = toRate;
@@ -248,7 +248,7 @@ namespace musicaccess
     /**
      * @todo apply hann window to input samples
      */
-    bool Resampler22kHzMono::resample2(int16_t** samplePtr, int& sampleCount, int32_t fromRate, int32_t toRate)
+    bool Resampler22kHzMono::resample2(int16_t** samplePtr, int& sampleCount, int32_t fromRate, int32_t toRate) const
     {
         double fs = fromRate;
         double fs_ = toRate;
@@ -290,7 +290,7 @@ namespace musicaccess
     /**
      * @todo apply hann window to input samples
      */
-    bool Resampler22kHzMono::resample2(float** samplePtr, int& sampleCount, int32_t fromRate, int32_t toRate)
+    bool Resampler22kHzMono::resample2(float** samplePtr, int& sampleCount, int32_t fromRate, int32_t toRate) const
     {
         double fs = fromRate;
         double fs_ = toRate;
@@ -330,7 +330,7 @@ namespace musicaccess
         return true;
     }
 
-    bool Resampler22kHzMono::downsample(int16_t** samplePtr, int& sampleCount, unsigned int factor)
+    bool Resampler22kHzMono::downsample(int16_t** samplePtr, int& sampleCount, unsigned int factor) const
     {
         //use sampleCount / factor samples
         sampleCount /= factor;
@@ -349,7 +349,7 @@ namespace musicaccess
         
         return true;
     }
-    bool Resampler22kHzMono::downsample(float** samplePtr, int& sampleCount, unsigned int factor)
+    bool Resampler22kHzMono::downsample(float** samplePtr, int& sampleCount, unsigned int factor) const
     {
         //use sampleCount / factor samples
         sampleCount /= factor;
@@ -370,7 +370,7 @@ namespace musicaccess
         return true;
     }
 
-    bool Resampler22kHzMono::resample(uint32_t fromSampleRate, int16_t** samplePtr, int& sampleCount, unsigned int channelCount)
+    bool Resampler22kHzMono::resample(uint32_t fromSampleRate, int16_t** samplePtr, int& sampleCount, unsigned int channelCount) const
     {
         //first convert to mono - we do not need stereo or more channels.
         unsigned int frameCount = sampleCount/channelCount;
@@ -443,7 +443,7 @@ namespace musicaccess
         
         return true;
     }
-    bool Resampler22kHzMono::resample(uint32_t fromSampleRate, float** samplePtr, int& sampleCount, unsigned int channelCount)
+    bool Resampler22kHzMono::resample(uint32_t fromSampleRate, float** samplePtr, int& sampleCount, unsigned int channelCount) const
     {
         //first convert to mono - we do not need stereo or more channels.
         unsigned int frameCount = sampleCount/channelCount;
