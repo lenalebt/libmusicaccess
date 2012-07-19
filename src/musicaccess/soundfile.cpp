@@ -20,6 +20,11 @@ namespace musicaccess
     {
         if (fileOpen)
             close();
+        if (metadata != NULL)
+        {
+            delete metadata;
+            metadata = NULL;
+        }
         //will destroy mpg123 and sndfile if necessary
         SingletonInitializer::destroy();
     }
