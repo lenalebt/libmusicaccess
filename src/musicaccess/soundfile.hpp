@@ -22,6 +22,7 @@ namespace musicaccess
         std::string album;
         std::string genre;
         std::string filename;
+        std::string year;
     protected:
         
     public:
@@ -30,12 +31,14 @@ namespace musicaccess
         std::string getAlbum() const;
         std::string getGenre() const;
         std::string getFilename() const;
+        std::string getYear() const;
         
-        void getTitle(const std::string& title);
-        void getArtist(const std::string& artist);
-        void getAlbum(const std::string& album);
-        void getGenre(const std::string& genre);
-        void getFilename(const std::string& filename);
+        void setTitle(const std::string& title);
+        void setArtist(const std::string& artist);
+        void setAlbum(const std::string& album);
+        void setGenre(const std::string& genre);
+        void setFilename(const std::string& filename);
+        void setYear(const std::string& year);
     };
     
     enum SOUNDFILE_DATATYPE
@@ -114,6 +117,7 @@ namespace musicaccess
             static void destroy();
             ~SingletonInitializer();
         };
+        std::string mpg123_stringToStdString(mpg123_string* str);
     public:
         SoundFile();
         ~SoundFile();
@@ -239,6 +243,8 @@ namespace musicaccess
         
         /**
          * @brief Returns the metadata of the opened sound file (if any)
+         * @remarks For now, metadata is only supported for mp3 files. id3v2
+         *      is preferred if both id3v1 and id3v2 tags are available.
          * @return The metadata of the sound file, or NULL if there is no metadata.
          */
         SoundFileMetadata* getMetadata();
