@@ -344,7 +344,7 @@ namespace musicaccess
         
     }
     
-    SoundFileMetadata* getMetadata()
+    SoundFileMetadata* SoundFile::getMetadata()
     {
         return metadata;
     }
