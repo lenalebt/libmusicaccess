@@ -10,7 +10,8 @@ namespace musicaccess
         channelCount(0), sampleSize(0), sampleCount(0),
         sampleRate(0), position(0), fileOpen(false),
         dataType(DATATYPE_UNKNOWN),
-        mpg123Handle(NULL), sndfileHandle(NULL)
+        mpg123Handle(NULL), sndfileHandle(NULL),
+        metadata(NULL)
     {
         //will init mpg123 and sndfile if necessary
         SingletonInitializer::initialize();
@@ -148,6 +149,12 @@ namespace musicaccess
 
     bool SoundFile::close()
     {
+        if (metadata != NULL)
+        {
+            delete metadata;
+            metadata = NULL;
+        }
+        
         if (fileOpen)
         {
             if (dataType == DATATYPE_MPG123)
@@ -336,4 +343,21 @@ namespace musicaccess
     {
         
     }
+    
+    SoundFileMetadata* getMetadata()
+    {
+        return metadata;
+    }
+    
+    std::string SoundFileMetadata::getTitle() const                     {return title;}
+    std::string SoundFileMetadata::getArtist() const                    {return artist;}
+    std::string SoundFileMetadata::getAlbum() const                     {return album;}
+    std::string SoundFileMetadata::getGenre() const                     {return genre;}
+    std::string SoundFileMetadata::getFilename() const                  {return filename;}
+    
+    void SoundFileMetadata::getTitle(const std::string& title)          {this->title = title;}
+    void SoundFileMetadata::getArtist(const std::string& artist)        {this->artist = artist;}
+    void SoundFileMetadata::getAlbum(const std::string& album)          {this->album = album;}
+    void SoundFileMetadata::getGenre(const std::string& genre)          {this->genre = genre;}
+    void SoundFileMetadata::getFilename(const std::string& filename)    {this->filename = filename;}
 }
