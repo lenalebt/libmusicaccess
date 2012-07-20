@@ -26,6 +26,10 @@ ELSEIF (CMAKE_BUILD_TYPE STREQUAL Profiling)
     ADD_DEFINITIONS(-DNDEBUG)
 ENDIF ()
 
+IF (DEBUG_LEVEL)
+    ADD_DEFINITIONS(-DDEBUG_LEVEL=${DEBUG_LEVEL})
+ENDIF()
+
 #here, you would set some compiler specific things
 IF ( CMAKE_COMPILER_IS_GNUCXX )
     MESSAGE ("Using Gnu g++ compiler...")

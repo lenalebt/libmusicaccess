@@ -1073,6 +1073,14 @@ namespace tests
         
         CHECK(file.getMetadata() != NULL);
         
+        DEBUG_OUT("metadata from the file:" << std::endl
+			<< "\t artist: " << file.getMetadata()->getArtist() << std::endl
+			<< "\t title:  " << file.getMetadata()->getTitle() << std::endl
+			<< "\t album:  " << file.getMetadata()->getAlbum() << std::endl
+			<< "\t year:   " << file.getMetadata()->getYear() << std::endl
+			<< "\t genre:  " << file.getMetadata()->getGenre() << std::endl
+        , 0);
+        
         return EXIT_SUCCESS;
     }
 }

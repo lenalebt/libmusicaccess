@@ -400,6 +400,14 @@ namespace musicaccess
     std::string SoundFile::mpg123_stringToStdString(mpg123_string* str)
     {
         //TODO: This might be unsafe and a security risk.
-        return std::string(str->p);
+        if (str != NULL)
+        {
+			if ((str->p != NULL) && (str->fill > 0))
+				return std::string(str->p);
+			else
+				return std::string("");
+		}
+		else
+			return std::string("");
     }
 }
