@@ -32,6 +32,16 @@ int main(int argc, char *argv[])
         return tests::testSortingIIRFilter();
     else if (testname == "resampling")
         return tests::testResampling();
+    else if (testname == "showmetadata")
+    {
+        if (argc < 3)
+        {
+            std::cout << "this test needs extra parameters:" << std::endl;
+            std::cout << "call \"" << argv[0] << " showmetadata filename\"" << std::endl;
+            return EXIT_FAILURE;
+        }
+        return tests::showMetadata(argv[2]);
+    }
     else
     {
         std::cout << "test \"" << testname << "\" is unknown." << std::endl;
