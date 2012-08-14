@@ -7,6 +7,11 @@ PROJECT(musicaccess)
 SET (musicaccess_VERSION_MAJOR 0)
 SET (musicaccess_VERSION_MINOR 01)
 
+# you can choose to include secret rabbit code (aka libsamplerate) in this build.
+# keep in mind: this makes the build being licensed as GNU GPL, which in turn
+# means you need to open the source code and allow modifications!
+OPTION(USE_GPL_SRC "build with support for libsamplerate. Do not publish binary if you want to keep your sources closed (infects source with GPL)." OFF)
+
 #tell the compiler to include the version number as preprocessor directive
 ADD_DEFINITIONS(-DVERSION=${musicaccess_VERSION_MAJOR}.${musicaccess_VERSION_MINOR})
 
@@ -53,6 +58,15 @@ FIND_PACKAGE(Doxygen)
 FIND_PACKAGE(Octave)
 FIND_PACKAGE(Matlab)
 
+# if wanted by the user, compile with secret rabbit code support.
+# this should not be enabled by default!
+IF(USE_GPL_SRC)
+    MESSAGE ("Building with libsamplerate, do not publish binary if you do not intent to open your sources...")
+    FIND_PACKAGE(SRC REQUIRED)
+    ADD_DEFINITIONS(-DUSE_GPL_SRC=1)
+ENDIF(USE_GPL_SRC)
+
+
 #place source files here
 SET(
     musicaccess_SOURCES
@@ -95,6 +109,7 @@ SET(
 INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${SQLITE_INCLUDE_DIRS}
+    ${SRC_INCLUDE_DIR}      #note: SRC will only be included if explicitly wanted on the command line.
     src/
     src/musicaccess
     src/tests
@@ -140,6 +155,7 @@ ADD_LIBRARY(
 TARGET_LINK_LIBRARIES(musicaccess
     ${SNDFILE_LIBRARIES}
     ${MPG123_LIBRARIES}
+    ${SRC_LIBRARIES}              #note: SRC will only be included if explicitly wanted on the command line.
     )
 SET_TARGET_PROPERTIES(musicaccess
     PROPERTIES COMPILE_FLAGS "-fPIC -shared"
@@ -189,6 +205,7 @@ ADD_EXECUTABLE(musicaccesstests
 TARGET_LINK_LIBRARIES(musicaccesstests
     ${SNDFILE_LIBRARIES}
     ${MPG123_LIBRARIES}
+    ${SRC_LIBRARIES}              #note: SRC will only be included if explicitly wanted on the command line.
     )
 SET_TARGET_PROPERTIES(musicaccesstests
     PROPERTIES COMPILE_FLAGS "-fPIC -shared"
