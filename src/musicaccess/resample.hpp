@@ -24,8 +24,12 @@ namespace musicaccess
      * @endcode
      * 
      * 
-     * @bug Currently only works for 44100Hz source formats. 22050Hz works
+     * @bug Currently only works for 44100Hz source formats, if you use
+     *      the internal resampler. 22050Hz works
      *      more or less, 32000Hz and 48000Hz are not working properly!
+     *      If you take libsamplerate for resampling, everything works -
+     *      but in this case, you need to release your source together with
+     *      your binaries.
      * 
      * @author Lena Brueder
      * @date 2012-05-21

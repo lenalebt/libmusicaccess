@@ -131,6 +131,7 @@ namespace musicaccess
          * uses libsndfile.
          * 
          * @param filename The filename you want to open.
+         * @param decodeToFloat Determines, wether you want to decode to float or to integer numbers.
          * @return <code>true</code>, if opening the file was successful, <code>false</code> otherwise.
          */
         bool open(const std::string&, bool decodeToFloat=false);
