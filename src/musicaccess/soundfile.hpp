@@ -222,7 +222,7 @@ namespace musicaccess
          *      have.
          * @return the sample count that actually was read
          */
-        size_t readSamples(int16_t* buffer, int count);
+        size_t readSamples(int16_t* buffer, unsigned int count);
         
         /**
          * @brief Returns the next samples, formatted as float.
@@ -240,7 +240,7 @@ namespace musicaccess
          *      have.
          * @return the sample count that actually was read
          */
-        size_t readSamples(float* buffer, int count);
+        size_t readSamples(float* buffer, unsigned int count);
         
         /**
          * @brief Returns the metadata of the opened sound file (if any)
