@@ -231,8 +231,14 @@ namespace musicaccess
             return true;
     }
 
-    size_t SoundFile::readSamples(int16_t* buffer, int count)
+    size_t SoundFile::readSamples(int16_t* buffer, unsigned int count)
     {
+        if (!fileOpen)
+        {
+            std::cerr << "trying to read without opening a file!" << std::endl;
+            return 0;
+        }
+        
         if (dataType == DATATYPE_MPG123)
         {   //return data from libmpg123
             int error;
@@ -248,8 +254,8 @@ namespace musicaccess
             {
                 //read as float and reformat to int16_t
                 float* floatBuffer = new float[count];
-                mpg123_read( mpg123Handle, (unsigned char*)floatBuffer, count*sizeof(float), &bytesRead );
-                for (int i=0; i<count; i++)
+                error = mpg123_read( mpg123Handle, (unsigned char*)floatBuffer, count*sizeof(float), &bytesRead );
+                for (unsigned int i=0; i<count; i++)
                 {
                     buffer[i] = 32768.0 * floatBuffer[i];
                 }
@@ -286,8 +292,14 @@ namespace musicaccess
         }
     }
     
-    size_t SoundFile::readSamples(float* buffer, int count)
+    size_t SoundFile::readSamples(float* buffer, unsigned int count)
     {
+        if (!fileOpen)
+        {
+            std::cerr << "trying to read without opening a file!" << std::endl;
+            return 0;
+        }
+        
         if (dataType == DATATYPE_MPG123)
         {   //return data from libmpg123
             int error;
@@ -303,8 +315,8 @@ namespace musicaccess
             {
                 //read as int16_t and reformat as float
                 int16_t* intBuffer = new int16_t[count];
-                mpg123_read( mpg123Handle, (unsigned char*)intBuffer, count*sizeof(int16_t), &bytesRead );
-                for (int i=0; i<count; i++)
+                error = mpg123_read( mpg123Handle, (unsigned char*)intBuffer, count*sizeof(int16_t), &bytesRead );
+                for (unsigned int i=0; i<count; i++)
                 {
                     buffer[i] = float(intBuffer[i]) / 32768.0;
                 }
