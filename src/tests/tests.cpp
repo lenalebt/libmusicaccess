@@ -290,6 +290,8 @@ namespace tests
             sf_close(sndfileHandle);
             soundfile.close();
         }
+        if (buffer)
+            delete[] buffer;
         
         //from here: test floats.
         std::cerr << "testing floating point resampling" << std::endl;

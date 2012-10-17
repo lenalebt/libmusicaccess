@@ -60,6 +60,7 @@ namespace musicaccess
         //feedback coefficient count
         int B;
     public:
+        IIRFilter(const IIRFilter& filter);
         /**
          * @brief Applies the given IIR filter to the input buffer in-place.
          * 

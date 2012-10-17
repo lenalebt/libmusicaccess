@@ -4,6 +4,11 @@
 #include <algorithm>
 #include <cctype>
 
+#ifdef HAVE_VORBISFILE
+    #include "vorbisfile.h"
+    #include "vorbis/codec.h"
+#endif
+
 namespace musicaccess
 {
     SoundFile::SoundFile() :
@@ -41,7 +46,7 @@ namespace musicaccess
         this->decodeToFloat = decodeToFloat;
         
         std::string loweredFilename(filename);
-        std::transform(loweredFilename.begin(), loweredFilename.end(), loweredFilename.begin(), ::tolower);
+        tolower(loweredFilename);
         
         //std::cerr << loweredFilename << std::endl;
         
@@ -159,6 +164,38 @@ namespace musicaccess
         else
         {   //use libsndfile
             dataType = DATATYPE_SNDFILE;
+            
+            #ifdef HAVE_VORBISFILE
+            if (endsWith(loweredFilename, ".ogg"))
+            {
+                metadata = new SoundFileMetadata();
+                metadata->setFilename(filename);
+                
+                OggVorbis_File vf;
+                if (ov_fopen(filename.c_str(), &vf) != 0)
+                    return false;
+                
+                vorbis_comment* comment = NULL;
+                comment = ov_comment(&vf, -1);
+                
+                for (int i=0; i<comment->comments; i++)
+                {
+                    std::string actComment(comment->user_comments[i]);
+                    std::string loweredComment = actComment;
+                    tolower(loweredComment);
+                    
+                    if (loweredComment.substr(0, 6) == "title=")
+                        metadata->setTitle(actComment.substr(7, std::string::npos));
+                    else if (loweredComment.substr(0, 7) == "artist=")
+                        metadata->setTitle(actComment.substr(8, std::string::npos));
+                    else if (loweredComment.substr(0, 6) == "album=")
+                        metadata->setTitle(actComment.substr(7, std::string::npos));
+                }
+                
+                vorbis_comment_clear(comment);
+                ov_clear(&vf);
+            }
+            #endif  //HAVE_VORBISFILE
             
             SF_INFO sfinfo;
             sfinfo.format = 0;  //documentation says I need to do so

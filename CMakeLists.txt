@@ -16,7 +16,7 @@ OPTION(USE_GPL_SRC "build with support for libsamplerate. Do not publish binary 
 ADD_DEFINITIONS(-DVERSION=${musicaccess_VERSION_MAJOR}.${musicaccess_VERSION_MINOR})
 
 #this was mainly done to understand cmake
-MESSAGE ( "Choose build type by typing \"cmake -DCMAKE_BUILD_TYPE=Debug\" or \"cmake -DCMAKE_BUILD_TYPE=Release\" or \"cmake -DCMAKE_BUILD_TYPE=Profiling\".")
+MESSAGE ( "Choose build type by typing \"cmake -DCMAKE_BUILD_TYPE=Debug\" or \"cmake -DCMAKE_BUILD_TYPE=Release\" or \"cmake -DCMAKE_BUILD_TYPE=Profiling\" or \"cmake -DCMAKE_BUILD_TYPE=Valgrind\".")
 IF (CMAKE_BUILD_TYPE STREQUAL Debug)
     MESSAGE("CMAKE_BUILD_TYPE set to Debug.")
 ELSEIF (CMAKE_BUILD_TYPE STREQUAL Release)
@@ -26,6 +26,12 @@ ELSEIF (CMAKE_BUILD_TYPE STREQUAL Release)
 ELSEIF (CMAKE_BUILD_TYPE STREQUAL Profiling)
     MESSAGE("CMAKE_BUILD_TYPE set to Profiling.")
     SET(CMAKE_CXX_FLAGS_PROFILING "-pg")
+#    SET(CMAKE_EXE_LINKER_FLAGS_PROFILING "-pg")
+    #for assert.h
+    ADD_DEFINITIONS(-DNDEBUG)
+ELSEIF (CMAKE_BUILD_TYPE STREQUAL Valgrind)
+    MESSAGE("CMAKE_BUILD_TYPE set to Valgrind.")
+    SET(CMAKE_CXX_FLAGS_VALGRIND "-g -O3")
 #    SET(CMAKE_EXE_LINKER_FLAGS_PROFILING "-pg")
     #for assert.h
     ADD_DEFINITIONS(-DNDEBUG)
@@ -57,6 +63,11 @@ FIND_PACKAGE(Doxygen)
 #octave or matlab will be used for some test cases
 FIND_PACKAGE(Octave)
 FIND_PACKAGE(Matlab)
+FIND_PACKAGE(Vorbisfile)
+IF(VORBISFILE_FOUND)
+    ADD_DEFINITIONS(-DHAVE_VORBISFILE=1)
+    INCLUDE_DIRECTORIES(${VORBISFILE_INCLUDE_DIR})
+ENDIF()
 
 # if wanted by the user, compile with secret rabbit code support.
 # this should not be enabled by default!
@@ -110,6 +121,7 @@ INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${SQLITE_INCLUDE_DIRS}
     ${SRC_INCLUDE_DIR}      #note: SRC will only be included if explicitly wanted on the command line.
+    ${MPG123_INCLUDE_DIR_UNIX}
     src/
     src/musicaccess
     src/tests
@@ -205,6 +217,7 @@ ADD_EXECUTABLE(musicaccesstests
 TARGET_LINK_LIBRARIES(musicaccesstests
     ${SNDFILE_LIBRARIES}
     ${MPG123_LIBRARIES}
+    ${VORBISFILE_LIBRARIES}
     ${SRC_LIBRARIES}              #note: SRC will only be included if explicitly wanted on the command line.
     )
 SET_TARGET_PROPERTIES(musicaccesstests
@@ -271,7 +284,7 @@ SET(CPACK_SOURCE_IGNORE_FILES
 INCLUDE(CPack)
 
 INSTALL (TARGETS musicaccess
-    DESTINATION bin
+    LIBRARY DESTINATION lib
     )
 FILE(GLOB music_global_headers "${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp")
 INSTALL (FILES ${music_global_headers}
