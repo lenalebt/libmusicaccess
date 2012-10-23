@@ -113,7 +113,8 @@ namespace musicaccess
         /**
          * @brief Creates a IIR filter that exactly does nothing.
          * 
-         * This function is used mainly for testing.
+         * This function is used mainly for testing. The created
+         * filter is a no-op filter.
          * 
          * @return An IIR filter that does not change the input signal.
          */
