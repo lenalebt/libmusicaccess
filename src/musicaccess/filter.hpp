@@ -104,7 +104,8 @@ namespace musicaccess
          * constraint. This might lead to more frequencies being cut off than
          * necessary.
          * 
-         * @remarks This function might create a filter that cuts more than was needed.
+         * @remarks This function might create a filter that cuts off a
+         *      bit more than was needed or intended.
          * 
          * @return an IIR filter that does lowpass filtering.
          */
