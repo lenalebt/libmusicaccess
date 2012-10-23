@@ -171,7 +171,7 @@ namespace musicaccess
          * 
          * In detail, the new filter will use exactly the same coefficients
          * the old filter uses, but apply them in a different order.
-         * Doing so, we will gain better stability and accuracy. The filter
+         * Doing so, we should gain better stability and accuracy. The filter
          * coefficients will be sorted and added up in the order of
          * ascending absolute values.
          */
