@@ -163,11 +163,17 @@ ADD_LIBRARY(
     musicaccess SHARED
     ${musicaccess_SOURCES}
     )
+
+IF(VORBISFILE_FOUND)
+    TARGET_LINK_LIBRARIES(musicaccess
+    ${VORBISFILE_LIBRARIES}
+    )
+ENDIF(VORBISFILE_FOUND)
+
 #tell the linker which libs need to be linked
 TARGET_LINK_LIBRARIES(musicaccess
     ${SNDFILE_LIBRARIES}
     ${MPG123_LIBRARIES}
-    ${VORBISFILE_LIBRARIES}
     ${SRC_LIBRARIES}              #note: SRC will only be included if explicitly wanted on the command line.
     )
 SET_TARGET_PROPERTIES(musicaccess
@@ -214,11 +220,16 @@ ADD_EXECUTABLE(musicaccesstests
     ${musicaccess_TEST_SOURCES}
     )
 
+IF(VORBISFILE_FOUND)
+    TARGET_LINK_LIBRARIES(musicaccesstests
+    ${VORBISFILE_LIBRARIES}
+    )
+ENDIF(VORBISFILE_FOUND)
+
 #tell the linker which libs need to be linked
 TARGET_LINK_LIBRARIES(musicaccesstests
     ${SNDFILE_LIBRARIES}
     ${MPG123_LIBRARIES}
-    ${VORBISFILE_LIBRARIES}
     ${SRC_LIBRARIES}              #note: SRC will only be included if explicitly wanted on the command line.
     )
 SET_TARGET_PROPERTIES(musicaccesstests
