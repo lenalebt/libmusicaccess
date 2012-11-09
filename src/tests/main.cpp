@@ -10,6 +10,12 @@
 
 int main(int argc, char *argv[])
 {
+    std::cout << argv[0] << ", built with";
+    #ifndef USE_GPL_SRC
+        std::cout << "out";
+    #endif  //USE_GPL_SRC
+    std::cout << " support of libsamplerate." << std::endl << std::endl;
+    
     if (argc < 2)
     {
         std::cout << "you need to tell the program which test it should run." << std::endl;
