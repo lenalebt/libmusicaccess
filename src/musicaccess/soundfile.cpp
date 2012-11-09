@@ -269,7 +269,7 @@ namespace musicaccess
             }
             else
             {
-                std::cerr << "mpg123: error while reading: " << mpg123_plain_strerror(error) << std::endl;
+                std::cerr << "mpg123: error while reading at position " << position << ": " << error << ", \"" << mpg123_plain_strerror(error) << "\"" << std::endl;
                 return 0;
             }
         }
@@ -314,7 +314,11 @@ namespace musicaccess
             
             position += framesRead;
             
-            if (error == MPG123_DONE)
+            if (position >= count)
+            {
+                return framesRead;
+            }
+            else if (error == MPG123_DONE)
             {   //okay, decoding finished
                 return framesRead;
             }
@@ -324,7 +328,7 @@ namespace musicaccess
             }
             else
             {
-                std::cerr << "mpg123: error while reading: " << mpg123_plain_strerror(error) << std::endl;
+                std::cerr << "mpg123: error while reading at position " << position << ": " << error << ", \"" << mpg123_plain_strerror(error) << "\"" << std::endl;
                 return 0;
             }
         }
