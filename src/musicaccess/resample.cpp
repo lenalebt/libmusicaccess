@@ -10,6 +10,7 @@
 #include <sndfile.h>
 
 #define SINC_IMPLEMENTATION 0
+#define WINDOW_IMPLEMENTATION 1
 
 namespace musicaccess
 {
@@ -103,6 +104,19 @@ namespace musicaccess
         }
     #endif  //USE_LUT_SINC
 
+    #if WINDOW_IMPLEMENTATION==0
+        //Implementation 0 is a noop window.
+        inline double window(int width, int position)
+        {
+            return 1.0;
+        }
+    #elif WINDOW_IMPLEMENTATION==1
+        //Implementation 1 is the hann window.
+        inline double window(int width, int position)
+        {
+            return 0.5 * (1-std::cos(2*M_PI*position/width));
+        }
+    #endif
     /**
      * @brief Calculates the greatest common divisor of two integers.
      * 
@@ -257,7 +271,10 @@ namespace musicaccess
             for(int n=-10 + std::floor(t*fs+0.5); n <= 10 + std::floor(t*fs+0.5); n++ )
             {
                 sum += double(getArrayElement<int16_t>(*samplePtr, n*T, sampleCount, fromRate)) *
-                    sinc(fs*(t - n*T));     //sinc-funktion hat die falsche breite!
+                //window function
+                window(21, n) *
+                //sinc function
+                sinc(fs*(t - n*T));
                 //newVal += sinc(fs*(t - n*T));
             }
             //std::cout << t << " " << double(getArrayElement<int16_t>(*samplePtr, t*fs*T, sampleCount, fromRate)) << " " << newVal << std::endl;
