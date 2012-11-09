@@ -233,6 +233,12 @@ namespace musicaccess
 
     size_t SoundFile::readSamples(int16_t* buffer, int count)
     {
+        if (!fileOpen)
+        {
+            std::cerr << "trying to read without opening a file!" << std::endl;
+            return 0;
+        }
+        
         if (dataType == DATATYPE_MPG123)
         {   //return data from libmpg123
             int error;
@@ -288,6 +294,12 @@ namespace musicaccess
     
     size_t SoundFile::readSamples(float* buffer, int count)
     {
+        if (!fileOpen)
+        {
+            std::cerr << "trying to read without opening a file!" << std::endl;
+            return 0;
+        }
+        
         if (dataType == DATATYPE_MPG123)
         {   //return data from libmpg123
             int error;
