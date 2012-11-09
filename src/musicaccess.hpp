@@ -13,6 +13,7 @@
  * libmusicaccess allows opening/reading, filtering and resampling tasks.
  * 
  * @section mainpage_install Install
+ * @todo prequisites, such as needed libraries
  * @subsection mainpage_normal_install Installing on a normal *nix system
  * 
  * If you want to install the library in a normal, 
