@@ -50,6 +50,9 @@ namespace musicaccess
         {   //use libmpg123
             dataType = DATATYPE_MPG123;
             int error;
+            mpg123_id3v1* id3v1;
+            mpg123_id3v2* id3v2;
+            int meta;
             mpg123Handle = mpg123_new(NULL, &error);
             if (error != MPG123_OK)
             {
@@ -69,6 +72,32 @@ namespace musicaccess
                 std::cerr << "mpg123: open failed, " << mpg123_plain_strerror(error) << std::endl;
                 fileOpen = false;
                 return false;
+            }
+            
+            meta = mpg123_meta_check(mpg123Handle);
+            if ((meta & MPG123_ID3) && (mpg123_id3(mpg123Handle, &id3v1, &id3v2) == MPG123_OK))
+            {
+                metadata = new SoundFileMetadata();
+                metadata->setFilename(filename);
+                if (id3v2 != NULL)
+                {
+                    metadata->setTitle(mpg123_stringToStdString(id3v2->title));
+                    metadata->setArtist(mpg123_stringToStdString(id3v2->artist));
+                    metadata->setAlbum(mpg123_stringToStdString(id3v2->album));
+                    metadata->setYear(mpg123_stringToStdString(id3v2->year));
+                    metadata->setGenre(mpg123_stringToStdString(id3v2->genre));
+                }
+                else
+                {
+                    if (id3v1 != NULL)
+                    {
+                        metadata->setTitle(std::string(id3v1->title));
+                        metadata->setArtist(std::string(id3v1->artist));
+                        metadata->setAlbum(std::string(id3v1->album));
+                        metadata->setYear(std::string(id3v1->year));
+                        metadata->setGenre("-not yet implemented-");    //TODO: Convert genre.
+                    }
+                }
             }
             
             int encoding;
@@ -359,10 +388,18 @@ namespace musicaccess
     std::string SoundFileMetadata::getAlbum() const                     {return album;}
     std::string SoundFileMetadata::getGenre() const                     {return genre;}
     std::string SoundFileMetadata::getFilename() const                  {return filename;}
+    std::string SoundFileMetadata::getYear() const                      {return year;}
     
-    void SoundFileMetadata::getTitle(const std::string& title)          {this->title = title;}
-    void SoundFileMetadata::getArtist(const std::string& artist)        {this->artist = artist;}
-    void SoundFileMetadata::getAlbum(const std::string& album)          {this->album = album;}
-    void SoundFileMetadata::getGenre(const std::string& genre)          {this->genre = genre;}
-    void SoundFileMetadata::getFilename(const std::string& filename)    {this->filename = filename;}
+    void SoundFileMetadata::setTitle(const std::string& title)          {this->title = title;}
+    void SoundFileMetadata::setArtist(const std::string& artist)        {this->artist = artist;}
+    void SoundFileMetadata::setAlbum(const std::string& album)          {this->album = album;}
+    void SoundFileMetadata::setGenre(const std::string& genre)          {this->genre = genre;}
+    void SoundFileMetadata::setFilename(const std::string& filename)    {this->filename = filename;}
+    void SoundFileMetadata::setYear(const std::string& year)            {this->year = year;}
+    
+    std::string SoundFile::mpg123_stringToStdString(mpg123_string* str)
+    {
+        //TODO: This might be unsafe and a security risk.
+        return std::string(str->p);
+    }
 }
