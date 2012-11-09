@@ -8,6 +8,35 @@
 
 namespace musicaccess
 {
+    /**
+     * @brief Objects of this class hold metadata of a SoundFile.
+     * 
+     * @author Lena Brueder
+     * @date 2012-07-19
+     */
+    class SoundFileMetadata
+    {
+    private:
+        std::string title;
+        std::string artist;
+        std::string album;
+        std::string genre;
+        std::string filename;
+    protected:
+        
+    public:
+        std::string getTitle() const;
+        std::string getArtist() const;
+        std::string getAlbum() const;
+        std::string getGenre() const;
+        std::string getFilename() const;
+        
+        void getTitle(const std::string& title);
+        void getArtist(const std::string& artist);
+        void getAlbum(const std::string& album);
+        void getGenre(const std::string& genre);
+        void getFilename(const std::string& filename);
+    };
     
     enum SOUNDFILE_DATATYPE
     {
@@ -60,6 +89,8 @@ namespace musicaccess
         
         mpg123_handle* mpg123Handle;
         SNDFILE*       sndfileHandle;
+        
+        SoundFileMetadata* metadata;
         
         /**
          * @brief This class will be used to call to initialization functions of
@@ -205,7 +236,12 @@ namespace musicaccess
          * @return the sample count that actually was read
          */
         size_t readSamples(float* buffer, int count);
-
+        
+        /**
+         * @brief Returns the metadata of the opened sound file (if any)
+         * @return The metadata of the sound file, or NULL if there is no metadata.
+         */
+        SoundFileMetadata* getMetadata();
     };
 }
 #endif  //SOUNDFILE_HPP 
