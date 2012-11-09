@@ -12,7 +12,7 @@ namespace musicaccess
     /**
      * @brief This class defines a simple audio filter.
      * 
-     * You cannot do more than apply this filter.
+     * The filter can be applied to a given buffer.
      * 
      * This is a pure virtual class, derive your own filters from this class.
      * 
@@ -39,7 +39,7 @@ namespace musicaccess
      * @brief This class defines an IIR filter implementation.
      * 
      * If you want some implementation you can use, take the factory methods to get
-     * one.
+     * one. There are some implementations given for low-pass filters.
      * 
      * 
      * @author Lena Brueder
