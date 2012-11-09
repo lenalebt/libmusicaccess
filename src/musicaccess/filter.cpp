@@ -299,6 +299,7 @@ namespace musicaccess
             //[B, A] = butter(6, 20000/22050)
             case 22050:
             {
+                /*
                 filter->A=6;
                 filter->a[0] = 1.000000000000000e+000;  
                 filter->a[1] = 4.872275990105688e+000;
@@ -316,6 +317,11 @@ namespace musicaccess
                 filter->b[4] = 8.510016512164306e+000;
                 filter->b[5] = 3.404006604865723e+000;
                 filter->b[6] = 5.673344341442871e-001;
+                */
+                filter->A = 0;
+                filter->b[0] = 1.0f;
+                filter->B = 1;
+                
                 break;
             }
             default:
