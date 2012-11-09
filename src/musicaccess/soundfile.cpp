@@ -3,6 +3,7 @@
 #include <iostream>
 #include <algorithm>
 #include <cctype>
+#include "debug.hpp"
 
 #ifdef HAVE_VORBISFILE
     #include "vorbisfile.h"
@@ -181,15 +182,36 @@ namespace musicaccess
                 for (int i=0; i<comment->comments; i++)
                 {
                     std::string actComment(comment->user_comments[i]);
+                    DEBUG_OUT("vorbis_comment: " << actComment, 15);
+                    
                     std::string loweredComment = actComment;
                     tolower(loweredComment);
                     
                     if (loweredComment.substr(0, 6) == "title=")
-                        metadata->setTitle(actComment.substr(7, std::string::npos));
+                    {
+                        metadata->setTitle(actComment.substr(6, std::string::npos));
+                        DEBUG_OUT("  title:  " << metadata->getTitle(), 15);
+                    }
                     else if (loweredComment.substr(0, 7) == "artist=")
-                        metadata->setTitle(actComment.substr(8, std::string::npos));
+                    {
+                        metadata->setArtist(actComment.substr(7, std::string::npos));
+                        DEBUG_OUT("  artist: " << metadata->getArtist(), 15);
+                    }
                     else if (loweredComment.substr(0, 6) == "album=")
-                        metadata->setTitle(actComment.substr(7, std::string::npos));
+                    {
+                        metadata->setAlbum(actComment.substr(6, std::string::npos));
+                        DEBUG_OUT("  album:  " << metadata->getAlbum(), 15);
+                    }
+                    else if (loweredComment.substr(0, 6) == "genre=")
+                    {
+                        metadata->setGenre(actComment.substr(6, std::string::npos));
+                        DEBUG_OUT("  genre:  " << metadata->getGenre(), 15);
+                    }
+                    else if (loweredComment.substr(0, 6) == "track=")
+                    {
+                        metadata->setTrack(actComment.substr(6, std::string::npos));
+                        DEBUG_OUT("  track: " << metadata->getTrack(), 15);
+                    }
                 }
                 
                 vorbis_comment_clear(comment);
@@ -445,6 +467,7 @@ namespace musicaccess
     std::string SoundFileMetadata::getGenre() const                     {return genre;}
     std::string SoundFileMetadata::getFilename() const                  {return filename;}
     std::string SoundFileMetadata::getYear() const                      {return year;}
+    std::string SoundFileMetadata::getTrack() const                     {return track;}
     
     void SoundFileMetadata::setTitle(const std::string& title)          {this->title = title;}
     void SoundFileMetadata::setArtist(const std::string& artist)        {this->artist = artist;}
@@ -452,6 +475,7 @@ namespace musicaccess
     void SoundFileMetadata::setGenre(const std::string& genre)          {this->genre = genre;}
     void SoundFileMetadata::setFilename(const std::string& filename)    {this->filename = filename;}
     void SoundFileMetadata::setYear(const std::string& year)            {this->year = year;}
+    void SoundFileMetadata::setTrack(const std::string& track)          {this->track = track;}
     
     std::string SoundFile::mpg123_stringToStdString(mpg123_string* str)
     {

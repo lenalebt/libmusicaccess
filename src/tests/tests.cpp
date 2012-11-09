@@ -146,6 +146,12 @@ namespace tests
         CHECK_EQ(file.getPosition(), 1424384u);
         CHECK_EQ(buffer[0], 0);
         CHECK_EQ(buffer[501], -44);
+        
+        metadata = file.getMetadata();
+        CHECK(metadata != NULL);
+        CHECK_EQ(metadata->getTitle(), "Quand je serai grand");
+        CHECK_EQ(metadata->getArtist(), "Lohstana David");
+        
         CHECK(file.close());
         CHECK(!file.isFileOpen());
         

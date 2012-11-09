@@ -23,6 +23,7 @@ namespace musicaccess
         std::string genre;
         std::string filename;
         std::string year;
+        std::string track;
     protected:
         
     public:
@@ -32,6 +33,7 @@ namespace musicaccess
         std::string getGenre() const;
         std::string getFilename() const;
         std::string getYear() const;
+        std::string getTrack() const;
         
         void setTitle(const std::string& title);
         void setArtist(const std::string& artist);
@@ -39,6 +41,7 @@ namespace musicaccess
         void setGenre(const std::string& genre);
         void setFilename(const std::string& filename);
         void setYear(const std::string& year);
+        void setTrack(const std::string& track);
     };
     
     enum SOUNDFILE_DATATYPE
