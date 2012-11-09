@@ -399,6 +399,35 @@ namespace musicaccess
         sampleCount = frameCount;
         *samplePtr = monoSamples;
         
+#ifdef USE_GPL_SRC
+        SRC_DATA srcdata;
+        
+        srcdata.data_in = new float[sampleCount];
+        src_short_to_float_array(*samplePtr, srcdata.data_in, sampleCount);
+        delete *samplePtr;
+        
+        srcdata.input_frames = sampleCount;
+        
+        srcdata.output_frames = int(sampleCount * 22050.0 / double(fromSampleRate)) + 1;
+        srcdata.data_out = new float[srcdata.output_frames];
+        
+        srcdata.src_ratio = 22050.0 / double(fromSampleRate);
+        
+        //do some fast conversion at reasonable quality
+        if (src_simple(&srcdata, SRC_SINC_FASTEST, 1) != 0)
+            return false;
+        
+        delete srcdata.data_in;
+        
+        *samplePtr = new int16_t[srcdata.output_frames];
+        
+        src_float_to_short_array(srcdata.data_out, *samplePtr, srcdata.output_frames);
+        delete srcdata.data_out;
+        
+        sampleCount = srcdata.output_frames;
+        
+#else   //do not use libsamplerate, do it by myself.
+        
         //first, apply low-pass filtering - we need this prior to resampling.
         IIRFilter* filter = IIRFilter::createLowpassFilter(11025, fromSampleRate);
         filter->apply(*samplePtr, sampleCount);
@@ -444,6 +473,7 @@ namespace musicaccess
             resample2(samplePtr, sampleCount, fromSampleRate, 22050);
             //do upsampling, then downsampling.
         }
+#endif //USE_GPL_SRC
         
         return true;
     }
@@ -487,6 +517,8 @@ namespace musicaccess
         //do some fast conversion at reasonable quality
         if (src_simple(&srcdata, SRC_SINC_FASTEST, 1) != 0)
             return false;
+        
+        delete srcdata.data_in;
         
         *samplePtr = srcdata.data_out;
         sampleCount = srcdata.output_frames;
