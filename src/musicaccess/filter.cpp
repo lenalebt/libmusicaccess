@@ -17,6 +17,18 @@ namespace musicaccess
     {
         
     }
+    IIRFilter::IIRFilter(const IIRFilter& filter) :
+        A(filter.A), B(filter.B)
+    {
+        for (int i = 0; i < A; i++)
+        {
+            a[i] = filter.a[i];
+        }
+        for (int i = 0; i < B; i++)
+        {
+            b[i] = filter.b[i];
+        }
+    }
 
     IIRFilter* IIRFilter::createLowpassFilter(float relativeCutoff)
     {
