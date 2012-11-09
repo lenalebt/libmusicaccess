@@ -231,6 +231,9 @@ namespace musicaccess
         return true;
     }
 
+    /**
+     * @todo apply hann window to input samples
+     */
     bool Resampler22kHzMono::resample2(int16_t** samplePtr, int& sampleCount, int32_t fromRate, int32_t toRate)
     {
         double fs = fromRate;
