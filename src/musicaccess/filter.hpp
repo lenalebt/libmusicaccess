@@ -89,7 +89,7 @@ namespace musicaccess
          * 44100, 48000 and 96000Hz) and cutoff frequency 11025Hz, and creates a Chebyshev
          * filter of order 10 or a Butterworth filter of order 6 - that depends on the
          * IIR_FILTER_IMPLEMENTATION compile time flag (currently to be set by hand in
-         * the implementation file).
+         * the implementation file). Standard setting is the Butterworth filter.
          * 
          * @return an IIR filter that does lowpass filtering.
          */
