@@ -338,7 +338,7 @@ namespace musicaccess
         return filter;
     }
 
-    void IIRFilter::apply(int16_t* buffer, int bufferSize)
+    void IIRFilter::apply(int16_t* buffer, int bufferSize) const
     {
         //applies an IIR filter in-place.
         
@@ -370,7 +370,7 @@ namespace musicaccess
             buffer[i] = int16_t(std::floor(tmpVal+0.5));
         }
     }
-    void IIRFilter::apply(float* buffer, int bufferSize)
+    void IIRFilter::apply(float* buffer, int bufferSize) const
     {
         //applies an IIR filter in-place.
         
@@ -407,7 +407,7 @@ namespace musicaccess
     {
         
     }
-    void SortingIIRFilter::apply(int16_t* buffer, int bufferSize)
+    void SortingIIRFilter::apply(int16_t* buffer, int bufferSize) const
     {
         //applies an IIR filter in-place, in order of growing absolute values of coefficients.
         
@@ -441,7 +441,7 @@ namespace musicaccess
             buffer[i] = int16_t(std::floor(tmpVal+0.5));
         }
     }
-    void SortingIIRFilter::apply(float* buffer, int bufferSize)
+    void SortingIIRFilter::apply(float* buffer, int bufferSize) const
     {
         //applies an IIR filter in-place, in order of growing absolute values of coefficients.
         
