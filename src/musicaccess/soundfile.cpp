@@ -23,7 +23,7 @@ namespace musicaccess
         SingletonInitializer::destroy();
     }
 
-    bool SoundFile::open(const std::string& filename)
+    bool SoundFile::open(const std::string& filename, bool decodeToFloat)
     {
         //first: close open files, if any.
         if (fileOpen)
@@ -31,6 +31,8 @@ namespace musicaccess
             if (!close())
                 return false;
         }
+        
+        this->decodeToFloat = decodeToFloat;
         
         std::string loweredFilename(filename);
         std::transform(loweredFilename.begin(), loweredFilename.end(), loweredFilename.begin(), ::tolower);
@@ -50,6 +52,10 @@ namespace musicaccess
                 return false;
             }
             
+            //force mpg123 to use float if chosen.
+            if (decodeToFloat)
+                mpg123_param(mpg123Handle, MPG123_ADD_FLAGS, MPG123_FORCE_FLOAT, 0.0);
+            
             //open file
             error = mpg123_open(mpg123Handle, filename.c_str());
             if (error != MPG123_OK)
@@ -68,12 +74,25 @@ namespace musicaccess
                 return false;
             }
             
-            if (encoding != MPG123_ENC_SIGNED_16)
+            if (decodeToFloat)
             {
-                std::cerr << "mpg123: wrong data encoding, requested 16bit signed integer. got 0x" << std::hex << encoding << std::endl;
-                fileOpen = false;
-                return false;
+                if (encoding != MPG123_ENC_FLOAT_32)
+                {
+                    std::cerr << "mpg123: wrong data encoding, requested float. got 0x" << std::hex << encoding << std::endl;
+                    fileOpen = false;
+                    return false;
+                }
             }
+            else
+            {
+                if (encoding != MPG123_ENC_SIGNED_16)
+                {
+                    std::cerr << "mpg123: wrong data encoding, requested 16bit signed integer. got 0x" << std::hex << encoding << std::endl;
+                    fileOpen = false;
+                    return false;
+                }
+            }
+
             
             //force mpg123 to not change the encoding or other things while decoding
             mpg123_format_none(mpg123Handle);
@@ -92,6 +111,8 @@ namespace musicaccess
             //get the size of one sample
             sampleSize = mpg123_encsize(encoding);
             
+            position = 0;
+            
             //okay, done now. file is open!
             
             fileOpen = true;
@@ -109,6 +130,11 @@ namespace musicaccess
             sampleRate = sfinfo.samplerate;
             channelCount = sfinfo.channels;
             sampleCount = sfinfo.frames * channelCount;
+            
+            if (decodeToFloat)
+                sampleSize = 4;
+            else
+                sampleSize = 2;
             
             //okay, done now. file is open! somehow less work than with libmpg123.
             
@@ -167,7 +193,20 @@ namespace musicaccess
         {   //return data from libmpg123
             int error;
             size_t bytesRead;
-            error = mpg123_read( mpg123Handle, (unsigned char*)buffer, count*sampleSize, &bytesRead );
+            
+            if (!decodeToFloat)
+                error = mpg123_read( mpg123Handle, (unsigned char*)buffer, count*sampleSize, &bytesRead );
+            else
+            {
+                //read as float and reformat to int16_t
+                float* floatBuffer = new float[count];
+                mpg123_read( mpg123Handle, (unsigned char*)floatBuffer, count*sizeof(float), &bytesRead );
+                for (int i=0; i<count; i++)
+                {
+                    buffer[i] = 32768.0 * floatBuffer[i];
+                }
+                delete[] floatBuffer;
+            }
             
             size_t framesRead = bytesRead / sampleSize;
             position += framesRead;
@@ -189,6 +228,56 @@ namespace musicaccess
         else if (dataType == DATATYPE_SNDFILE)
         {   //return data from libsndfile
             int itemsRead = sf_read_short(sndfileHandle, buffer, count);
+            position += itemsRead;
+            return itemsRead;
+        }
+        else
+        {
+            std::cerr << "trying to read unknown datatype!" << std::endl;
+            return 0;
+        }
+    }
+    
+    size_t SoundFile::readSamples(float* buffer, int count)
+    {
+        if (dataType == DATATYPE_MPG123)
+        {   //return data from libmpg123
+            int error;
+            size_t bytesRead;
+            if (decodeToFloat)
+                error = mpg123_read( mpg123Handle, (unsigned char*)buffer, count*sampleSize, &bytesRead );
+            else
+            {
+                //read as int16_t and reformat as float
+                int16_t* intBuffer = new int16_t[count];
+                mpg123_read( mpg123Handle, (unsigned char*)intBuffer, count*sizeof(int16_t), &bytesRead );
+                for (int i=0; i<count; i++)
+                {
+                    buffer[i] = float(intBuffer[i]) / 32768.0;
+                }
+                delete[] intBuffer;
+            }
+            
+            size_t framesRead = bytesRead / sampleSize;
+            position += framesRead;
+            
+            if (error == MPG123_DONE)
+            {   //okay, decoding finished
+                return framesRead;
+            }
+            else if (error == MPG123_OK)
+            {   //okay, more bytes follow
+                return framesRead;
+            }
+            else
+            {
+                std::cerr << "mpg123: error while reading: " << mpg123_plain_strerror(error) << std::endl;
+                return 0;
+            }
+        }
+        else if (dataType == DATATYPE_SNDFILE)
+        {   //return data from libsndfile
+            int itemsRead = sf_read_float(sndfileHandle, buffer, count);
             position += itemsRead;
             return itemsRead;
         }

@@ -28,6 +28,11 @@ namespace musicaccess
          * @brief Apply this filter to the given buffer with the given size.
          */
         virtual void apply(int16_t* buffer, int bufferSize)=0;
+        
+        /**
+         * @brief Apply this filter to the given buffer with the given size.
+         */
+        virtual void apply(float* buffer, int bufferSize)=0;
     };
 
     /**
@@ -64,6 +69,17 @@ namespace musicaccess
          *      you need the data in that buffer for other purposes, go make a copy!
          */
         void apply(int16_t* buffer, int bufferSize);
+        
+        /**
+         * @brief Applies the given IIR filter to the input buffer in-place.
+         * 
+         * @remarks The function internally uses a history buffer of <code>MUSICACCESS_IIRFILTER_COEFFICIENTCOUNT</code> samples, so
+         *      you will not be able to use more than <code>MUSICACCESS_IIRFILTER_COEFFICIENTCOUNT</code> coefficients.
+         * @remarks The given buffer will be overwritten to gain some speed. If
+         *      you need the data in that buffer for other purposes, go make a copy!
+         */
+        void apply(float* buffer, int bufferSize);
+        
         /**
          * @brief Creates a lowpass filter with given cutoff frequency at the given
          *  sample rate.
@@ -137,6 +153,16 @@ namespace musicaccess
          *      you need the data in that buffer for other purposes, go make a copy!
          */
         void apply(int16_t* buffer, int bufferSize);
+        
+        /**
+         * @brief Applies the given IIR filter to the input buffer in-place.
+         * 
+         * @remarks The function internally uses a history buffer of <code>MUSICACCESS_IIRFILTER_COEFFICIENTCOUNT</code> samples, so
+         *      you will not be able to use more than <code>MUSICACCESS_IIRFILTER_COEFFICIENTCOUNT</code> coefficients.
+         * @remarks The given buffer will be overwritten to gain some speed. If
+         *      you need the data in that buffer for other purposes, go make a copy!
+         */
+        void apply(float* buffer, int bufferSize);
         /**
          * @brief Creates an iir filter with better numeric stability
          *      from of a given iir filter.

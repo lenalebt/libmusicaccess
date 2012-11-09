@@ -5,6 +5,8 @@
 #include <cmath>
 #include <algorithm>
 
+#include <assert.h>
+
 //0 means chebychef filter type 2 of order 10 (or 5),
 //1 means butterworth filter of order 6.
 #define IIR_FILTER_IMPLEMENTATION 1
@@ -20,15 +22,15 @@ namespace musicaccess
     {
         if (11025.0/22050.0 < relativeCutoff)
             return createLowpassFilter(11025, 22050);
-        else if (11025.0/32000.0 < relativeCutoff)
+        else if (11025.0/32000.0 <= relativeCutoff)
             return createLowpassFilter(11025, 32000);
-        else if (11025.0/44100.0 < relativeCutoff)
+        else if (11025.0/44100.0 <= relativeCutoff)
             return createLowpassFilter(11025, 44100);
-        else if (11025.0/48000.0 < relativeCutoff)
+        else if (11025.0/48000.0 <= relativeCutoff)
             return createLowpassFilter(11025, 48000);
-        else if (11025.0/88200.0 < relativeCutoff)
+        else if (11025.0/88200.0 <= relativeCutoff)
             return createLowpassFilter(11025, 88200);
-        else if (11025.0/96000.0 < relativeCutoff)
+        else if (11025.0/96000.0 <= relativeCutoff)
             return createLowpassFilter(11025, 96000);
         else
             return NULL;
@@ -44,8 +46,10 @@ namespace musicaccess
                 << std::endl;
             cutoffFreq = 11025;
         }
-        IIRFilter* filter = new IIRFilter();
-        std::cout << "sample freq:" << sampleFreq << std::endl;
+        IIRFilter* filter = NULL;
+        filter = new IIRFilter();
+        assert(filter != NULL);
+        //std::cout << "sample freq:" << sampleFreq << std::endl;
         
 #if IIR_FILTER_IMPLEMENTATION==0
         switch (sampleFreq)
@@ -366,6 +370,38 @@ namespace musicaccess
             buffer[i] = int16_t(std::floor(tmpVal+0.5));
         }
     }
+    void IIRFilter::apply(float* buffer, int bufferSize)
+    {
+        //applies an IIR filter in-place.
+        
+        float history[MUSICACCESS_IIRFILTER_COEFFICIENTCOUNT];
+        for (int i = 0; i < MUSICACCESS_IIRFILTER_COEFFICIENTCOUNT; i++)
+        {
+            history[i] = 0;
+        }
+        
+        int historyPos=0;
+        for (int i = 0; i < bufferSize; i++, historyPos++)
+        {
+            if (historyPos >= MUSICACCESS_IIRFILTER_COEFFICIENTCOUNT)
+                historyPos -= MUSICACCESS_IIRFILTER_COEFFICIENTCOUNT;
+            
+            //save history, we need it because of the recursive structure (input values will be overwritten)
+            history[historyPos] = buffer[i];
+            
+            iirfilter_coefficienttype tmpVal=0.0;
+            for (int l = 1; l < A; l++)
+            {
+                tmpVal -= a[l] * ((i-l<0) ? 0.0 : (iirfilter_coefficienttype(buffer[i - l])));
+            }
+            for (int k = 0; k < B; k++)
+            {
+                //this is b[k] * x[i-k], written in terms of the history of our MUSICACCESS_IIRFILTER_COEFFICIENTCOUNT most recent input samples
+                tmpVal += b[k] * (iirfilter_coefficienttype(history[(historyPos - k + MUSICACCESS_IIRFILTER_COEFFICIENTCOUNT) % MUSICACCESS_IIRFILTER_COEFFICIENTCOUNT]));
+            }
+            buffer[i] = tmpVal;
+        }
+    }
     
     SortingIIRFilter::SortingIIRFilter()
     {
@@ -403,6 +439,40 @@ namespace musicaccess
                 tmpVal += b[bOrder[k]] * (iirfilter_coefficienttype(history[(historyPos - bOrder[k] + MUSICACCESS_IIRFILTER_COEFFICIENTCOUNT) % MUSICACCESS_IIRFILTER_COEFFICIENTCOUNT]));
             }
             buffer[i] = int16_t(std::floor(tmpVal+0.5));
+        }
+    }
+    void SortingIIRFilter::apply(float* buffer, int bufferSize)
+    {
+        //applies an IIR filter in-place, in order of growing absolute values of coefficients.
+        
+        float history[MUSICACCESS_IIRFILTER_COEFFICIENTCOUNT];
+        for (int i = 0; i < MUSICACCESS_IIRFILTER_COEFFICIENTCOUNT; i++)
+        {
+            history[i] = 0;
+        }
+        
+        int historyPos=0;
+        for (int i = 0; i < bufferSize; i++, historyPos++)
+        {
+            if (historyPos >= MUSICACCESS_IIRFILTER_COEFFICIENTCOUNT)
+                historyPos -= MUSICACCESS_IIRFILTER_COEFFICIENTCOUNT;
+            
+            //save history, we need it because of the recursive structure (input values will be overwritten)
+            history[historyPos] = buffer[i];
+            
+            iirfilter_coefficienttype tmpVal=0.0;
+            for (int l = 0; l < A; l++)
+            {
+                if (aOrder[l] == 0)
+                    continue;   //workaround for skipping a[0]
+                tmpVal -= a[aOrder[l]] * ((i-aOrder[l]<0) ? 0.0 : (iirfilter_coefficienttype(buffer[i - aOrder[l]])));
+            }
+            for (int k = 0; k < B; k++)
+            {
+                //this is b[k] * x[i-k], written in terms of the history of our MUSICACCESS_IIRFILTER_COEFFICIENTCOUNT most recent input samples
+                tmpVal += b[bOrder[k]] * (iirfilter_coefficienttype(history[(historyPos - bOrder[k] + MUSICACCESS_IIRFILTER_COEFFICIENTCOUNT) % MUSICACCESS_IIRFILTER_COEFFICIENTCOUNT]));
+            }
+            buffer[i] = tmpVal;
         }
     }
     bool SortingIIRFilter::pairFirstElementComparator(const std::pair<iirfilter_coefficienttype, int>& a, const std::pair<iirfilter_coefficienttype, int>& b)
