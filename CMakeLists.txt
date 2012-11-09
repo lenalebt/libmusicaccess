@@ -167,6 +167,7 @@ ADD_LIBRARY(
 TARGET_LINK_LIBRARIES(musicaccess
     ${SNDFILE_LIBRARIES}
     ${MPG123_LIBRARIES}
+    ${VORBISFILE_LIBRARIES}
     ${SRC_LIBRARIES}              #note: SRC will only be included if explicitly wanted on the command line.
     )
 SET_TARGET_PROPERTIES(musicaccess
