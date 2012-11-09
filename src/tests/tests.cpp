@@ -1062,4 +1062,17 @@ namespace tests
         
         return EXIT_SUCCESS;
     }
+    
+    int showMetadata(std::string filename)
+    {
+		DEBUG_OUT("Opening file: " << filename, 10);
+        musicaccess::SoundFile file;
+        CHECK(!file.isFileOpen());
+        CHECK(file.open(filename, true));
+        CHECK(file.isFileOpen());
+        
+        CHECK(file.getMetadata() != NULL);
+        
+        return EXIT_SUCCESS;
+    }
 }

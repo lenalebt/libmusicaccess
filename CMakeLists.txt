@@ -73,7 +73,9 @@ SET(
     ${musicaccess_SOURCES}
     src/tests/tests.cpp
     src/tests/testframework.cpp
+    src/tests/debug.cpp
     src/tests/main.cpp
+    src/tools/console_colors.cpp
     )
 
 SET(
@@ -81,7 +83,9 @@ SET(
     ${musicaccess_HEADERS}
     src/tests/tests.hpp
     src/tests/testframework.hpp
+    src/tests/debug.hpp
     src/tests/main.hpp
+    src/tools/console_colors.hpp
     )    
 
 INCLUDE_DIRECTORIES(
@@ -90,6 +94,7 @@ INCLUDE_DIRECTORIES(
     src/
     src/musicaccess
     src/tests
+    src/tools
     )
 
 #to copy a directory (e.g. test files) to another.
