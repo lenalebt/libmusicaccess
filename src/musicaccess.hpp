@@ -13,7 +13,21 @@
  * libmusicaccess allows opening/reading, filtering and resampling tasks.
  * 
  * @section mainpage_install Install
- * @todo prequisites, such as needed libraries
+ * @subsection mainpage_install_prequisites Prequisites
+ * To install the library, you need to install some other libraries and tools:
+ *  * <code>doxygen</code>, if you want to build the documentation. This package is optional.
+ *  * <code>cmake</code>, which is the build system and needed to compile the software.
+ *  * <code>libmpg123</code>, which is used to load mp3 files and read their metadata
+ *  * <code>libsndfile</code>, used to load all file types that cannot be handled by libmpg123.
+ *      <code>libsndfile</code> has some dependencies if you want to read e.g. FLAC or ogg/Vorbis files -
+ *      if you need them, install the dependencies. They are not needed to run the software.
+ *  * <code>libvorbisfile</code>, used to read metadata from ogg/Vorbis files. This package is optional.
+ *  * <code>matlab</code> or <code>octave</code>, which is used for some software tests. This is optional if
+ *      you do not need the software tests; otherwise you only need one of the dependencies, not both.
+ *  * <code>libsamplerate</code> if you do not want to use the builtin (buggy) resampling algorithms.
+ *      To use this library, you need to call cmake with the <code>-DUSE_GPL_SRC</code> flag.
+ *      The resulting software will be GPL, do not publish the binaries if you do not want to
+ *      publish the sources.
  * @subsection mainpage_normal_install Installing on a normal *nix system
  * 
  * If you want to install the library in a normal, 
@@ -21,12 +35,19 @@
  * type
  * 
  * @code{.sh}
- * cmake ..
+ * cmake -DCMAKE_BUILD_TYPE=Release -DUSE_GPL_SRC ..
  * make -j5
  * make install
  * @endcode
  * 
- * The last step might require root privileges. If you want to build 
+ * If the code may not contain GPL code, type instead:
+ * @code{.sh}
+ * cmake -DCMAKE_BUILD_TYPE=Release ..
+ * make -j5
+ * make install
+ * @endcode
+ * 
+ * The last step of both listings might require root privileges. If you want to build 
  * the docs, type
  * 
  * @code{.sh}
