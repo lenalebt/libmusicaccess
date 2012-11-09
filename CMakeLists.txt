@@ -5,7 +5,7 @@ PROJECT(musicaccess)
 
 #version number
 SET (musicaccess_VERSION_MAJOR 0)
-SET (musicaccess_VERSION_MINOR 02)
+SET (musicaccess_VERSION_MINOR 04)
 
 # you can choose to include secret rabbit code (aka libsamplerate) in this build.
 # keep in mind: this makes the build being licensed as GNU GPL, which in turn
