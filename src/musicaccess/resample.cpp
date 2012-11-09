@@ -451,7 +451,7 @@ namespace musicaccess
         float* samples = *samplePtr;
         for (unsigned int i = 0; i < frameCount; i++)
         {
-            int32_t tmpVal = 0;
+            float tmpVal = 0;
             int offset = channelCount * i;
             for (unsigned int j = 0; j < channelCount; j++)
             {

@@ -163,6 +163,7 @@ namespace tests
     
     int testResampling()
     {
+        std::cerr << "testing fixed point resampling" << std::endl;
         Resampler22kHzMono resampler;
         
         SoundFile file;
@@ -277,6 +278,120 @@ namespace tests
             
             SNDFILE* sndfileHandle = sf_open((std::string("./resampled-to22khz-from") + filename).c_str(), SFM_WRITE, &sfinfo);
             sf_writef_short(sndfileHandle, buffer, sampleCount);
+            sf_close(sndfileHandle);
+            soundfile.close();
+        }
+        
+        //from here: test floats.
+        std::cerr << "testing floating point resampling" << std::endl;
+        file.open("./testdata/test.mp3", true);
+        float* floatBuffer = NULL;
+        sampleCount = file.getSampleCount();
+        oldSampleCount = sampleCount;
+        floatBuffer = new float[sampleCount];
+        CHECK(floatBuffer != NULL);
+        file.readSamples(floatBuffer, sampleCount);
+        
+        resampler.resample(file.getSampleRate(), &floatBuffer, sampleCount, file.getChannelCount());
+        
+        //we need to have less samples. better check see below.
+        CHECK(sampleCount < oldSampleCount);
+        //half the sample rate, mono instead of stereo -> 1/4 the sample count
+        //CHECK_EQ(sampleCount, oldSampleCount/4);
+        
+        //write our filtered data to disk
+        sfinfo.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
+        sfinfo.samplerate = 22050;
+        sfinfo.channels = 1;
+        
+        sndfileHandle = sf_open("./test-resampled-22khz-mono.wav", SFM_WRITE, &sfinfo);
+        sf_writef_float(sndfileHandle, floatBuffer, sampleCount);
+        sf_close(sndfileHandle);
+        
+        file.open("./testdata/test-32khz.mp3", true);
+        //file.open("./testdata/sine-9000-32khz-long.wav");
+        delete[] floatBuffer;
+        floatBuffer = NULL;
+        sampleCount = file.getSampleCount();
+        oldSampleCount = sampleCount;
+        floatBuffer = new float[sampleCount];
+        CHECK(floatBuffer != NULL);
+        file.readSamples(floatBuffer, sampleCount);
+        
+        std::cerr << "now resampling..." << std::endl;
+        resampler.resample(file.getSampleRate(), &floatBuffer, sampleCount, file.getChannelCount());
+        std::cerr << "resampled..." << std::endl;
+        
+        //we need to have less samples. better check see below.
+        //CHECK(sampleCount < oldSampleCount);
+        //half the sample rate, mono instead of stereo -> 1/4 the sample count
+        //CHECK_EQ_TYPE(sampleCount, 1033566/2.0*22050.0/32000.0 + 1, int);
+        
+        //write our filtered data to disk
+        sfinfo.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
+        sfinfo.samplerate = 22050;
+        sfinfo.channels = 1;
+        
+        sndfileHandle = sf_open("./test-resampled-from32khz-22khz-mono.wav", SFM_WRITE, &sfinfo);
+        sf_writef_float(sndfileHandle, floatBuffer, sampleCount);
+        sf_close(sndfileHandle);
+        
+        std::cerr << "testing now with different sample rates and different sine waves..." << std::endl;
+        files.push("sine-8000-22khz.wav");
+        files.push("sine-8000-32khz.wav");
+        files.push("sine-8000-44khz.wav");
+        files.push("sine-8000-48khz.wav");
+        
+        files.push("sine-8900-22khz.wav");
+        files.push("sine-8900-32khz.wav");
+        files.push("sine-8900-44khz.wav");
+        files.push("sine-8900-48khz.wav");
+        
+        files.push("sine-9000-22khz.wav");
+        files.push("sine-9000-32khz.wav");
+        files.push("sine-9000-44khz.wav");
+        files.push("sine-9000-48khz.wav");
+        
+        files.push("sine-9900-22khz.wav");
+        files.push("sine-9900-32khz.wav");
+        files.push("sine-9900-44khz.wav");
+        files.push("sine-9900-48khz.wav");
+        
+        //do some batch resampling
+        while (!files.empty())
+        {
+            std::string filename = files.front();
+            files.pop();
+            
+            std::cerr << "resampling file \"" << std::string("./testdata/") + filename << "\" to 22khz..." << std::endl;
+            CHECK(soundfile.open(std::string("./testdata/") + filename));
+            
+            CHECK(soundfile.getSampleCount() > 0);
+            CHECK_EQ(soundfile.getChannelCount(), 1);
+            CHECK_OP(soundfile.getSampleRate(), >=, 22050);
+            CHECK_OP(soundfile.getSampleRate(), <=, 48000);
+            
+            if (floatBuffer)
+                delete[] floatBuffer;
+            floatBuffer = new float[soundfile.getSampleCount()];
+            soundfile.readSamples(floatBuffer, soundfile.getSampleCount());
+            
+            std::cerr << "resampling..." << std::endl;
+            int sampleCount = soundfile.getSampleCount();
+            resampler.resample(soundfile.getSampleRate(), &floatBuffer, sampleCount, soundfile.getChannelCount());
+            
+            //TODO: Do some checks.
+            std::cerr << "need to manually check these files if they are correct...: \""
+                << "./resampled-float-to22khz-from" << filename << "\"" << std::endl;
+            
+            //write our filtered data to disk
+            SF_INFO sfinfo;
+            sfinfo.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
+            sfinfo.samplerate = 22050;
+            sfinfo.channels = 1;
+            
+            SNDFILE* sndfileHandle = sf_open((std::string("./resampled-float-to22khz-from") + filename).c_str(), SFM_WRITE, &sfinfo);
+            sf_writef_float(sndfileHandle, floatBuffer, sampleCount);
             sf_close(sndfileHandle);
             soundfile.close();
         }
@@ -499,6 +614,7 @@ namespace tests
         
         
         //from this point, we are testing the float version of the filters
+        std::cerr << "testing float version of filters..." << std::endl;
         file.open("./testdata/test.mp3", true);
         float* floatBuffer = NULL;
         float* floatBuffer2 = NULL;
