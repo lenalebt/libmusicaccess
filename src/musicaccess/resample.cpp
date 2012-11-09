@@ -507,8 +507,6 @@ namespace musicaccess
         srcdata.data_in = *samplePtr;
         srcdata.input_frames = sampleCount;
         
-        //MISSING: data_out, output_frames
-        
         srcdata.output_frames = int(sampleCount * 22050.0 / double(fromSampleRate)) + 1;
         srcdata.data_out = new float[srcdata.output_frames];
         
