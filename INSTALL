@@ -1,22 +1,35 @@
-Installing the library
-======================
+Install
+=======
 
-If you want to install the library in a normal, 
-non-cross-compile-environment, just go to the "build/" directory and 
-type
+Prequisites
+===========
+To install the library, you need to install some other libraries and tools:
 
-cmake ..
+doxygen, if you want to build the documentation. This package is optional.
+cmake, which is the build system and needed to compile the software.
+libmpg123, which is used to load mp3 files and read their metadata
+libsndfile, used to load all file types that cannot be handled by libmpg123. libsndfile has some dependencies if you want to read e.g. FLAC or ogg/Vorbis files - if you need them, install the dependencies. They are not needed to run the software.
+libvorbisfile, used to read metadata from ogg/Vorbis files. This package is optional.
+matlab or octave, which is used for some software tests. This is optional if you do not need the software tests; otherwise you only need one of the dependencies, not both.
+libsamplerate if you do not want to use the builtin (buggy) resampling algorithms. To use this library, you need to call cmake with the -DUSE_GPL_SRC flag. The resulting software will be GPL, do not publish the binaries if you do not want to publish the sources.
+
+Installing on a normal *nix system
+==================================
+
+If you want to install the library in a normal, non-cross-compile-environment, just go to the "build/" directory and type
+
+cmake -DCMAKE_BUILD_TYPE=Release -DUSE_GPL_SRC ..
 make -j5
 make install
+If the code may not contain GPL code, type instead:
 
-The last step might require root privileges. If you want to build 
-the docs, type
+cmake -DCMAKE_BUILD_TYPE=Release ..
+make -j5
+make install
+The last step of both listings might require root privileges. If you want to build the docs, type
 
 make doc
-
-in the very same directory. You will find the docs in the api-doc/ 
-directory. There are two formats available, for the more common HTML 
-version open the file api-doc/html/index.html .
+in the very same directory. You will find the docs in the api-doc/ directory. There are two formats available, for the more common HTML version open the file api-doc/html/index.html .
 
 Installing for Cross-Compilation
 ================================
