@@ -7,6 +7,9 @@ namespace tests
     int testSoundFile();
     int testResampling();
     int testIIRFilter();
+    /**
+     * @todo missing: test for float-sortingiirfilter
+     */
     int testSortingIIRFilter();
 }
 
