@@ -60,6 +60,7 @@ namespace musicaccess
             mpg123_id3v2* id3v2;
             int meta;
             mpg123Handle = mpg123_new(NULL, &error);
+            mpg123_param(mpg123Handle, MPG123_ADD_FLAGS, MPG123_QUIET, MPG123_QUIET);
             if (error != MPG123_OK)
             {
                 std::cerr << "mpg123: setup failed, " << mpg123_plain_strerror(error) << std::endl;
