@@ -55,6 +55,7 @@ namespace musicaccess
          */
         bool resample(int16_t** samplePtr, int& sampleCount, double factor);
         bool resample2(int16_t** samplePtr, int& sampleCount, int32_t fromRate, int32_t toRate);
+        bool resample2(float** samplePtr, int& sampleCount, int32_t fromRate, int32_t toRate);
         bool resample(int16_t** samplePtr, int& sampleCount, int32_t fromRate, int32_t toRate);
         /**
          * @brief Takes the given sound samples and uses every nth of it to build a new array.

@@ -287,6 +287,48 @@ namespace musicaccess
         
         return true;
     }
+    /**
+     * @todo apply hann window to input samples
+     */
+    bool Resampler22kHzMono::resample2(float** samplePtr, int& sampleCount, int32_t fromRate, int32_t toRate)
+    {
+        double fs = fromRate;
+        double fs_ = toRate;
+        
+        double T = 1.0/fs;
+        double T_ = 1.0/fs_;
+        
+        float* newSamples = NULL;
+        int newSampleCount = int(sampleCount * fs_ / fs) + 1;
+        newSamples = new float[newSampleCount];
+        if (!newSamples)
+            return false;
+        
+        for (int m=0; m<newSampleCount; m++)
+        {
+            double t = m * T_;
+            
+            //double newVal=0.0;
+            double sum=0.0;
+            for(int n=-10 + std::floor(t*fs+0.5); n <= 10 + std::floor(t*fs+0.5); n++ )
+            {
+                sum += double(getArrayElement<float>(*samplePtr, n*T, sampleCount, fromRate)) *
+                //window function
+                window(21, n) *
+                //sinc function
+                sinc(fs*(t - n*T));
+                //newVal += sinc(fs*(t - n*T));
+            }
+            //std::cout << t << " " << double(getArrayElement<float>(*samplePtr, t*fs*T, sampleCount, fromRate)) << " " << newVal << std::endl;
+            newSamples[m] = sum;
+        }
+        
+        delete[] *samplePtr;
+        *samplePtr = newSamples;
+        sampleCount = newSampleCount;
+        
+        return true;
+    }
 
     bool Resampler22kHzMono::downsample(int16_t** samplePtr, int& sampleCount, unsigned int factor)
     {
@@ -463,7 +505,7 @@ namespace musicaccess
             filter->apply(*samplePtr, sampleCount);
             downsample(samplePtr, sampleCount, 2);*/
             //resample(samplePtr, sampleCount, fromSampleRate, 22050);
-            //THIS WAS ENABLED//resample2(samplePtr, sampleCount, fromSampleRate, 22050);
+            resample2(samplePtr, sampleCount, fromSampleRate, 22050);
             //do upsampling, then downsampling.
         }
         
