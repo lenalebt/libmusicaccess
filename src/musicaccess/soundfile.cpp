@@ -74,6 +74,9 @@ namespace musicaccess
                 return false;
             }
             
+            //need this to find id3 tags
+            mpg123_scan(mpg123Handle);
+            
             meta = mpg123_meta_check(mpg123Handle);
             if ((meta & MPG123_ID3) && (mpg123_id3(mpg123Handle, &id3v1, &id3v2) == MPG123_OK))
             {
@@ -405,9 +408,9 @@ namespace musicaccess
 			if ((str->p != NULL) && (str->fill > 0))
 				return std::string(str->p);
 			else
-				return std::string("");
+				return std::string("--EMPTY--");
 		}
 		else
-			return std::string("");
+			return std::string("--NULL--");
     }
 }
