@@ -126,9 +126,8 @@ namespace musicaccess
     /**
      * @brief This class defines an IIR filter implementation.
      * 
-     * If you want some implementation you can use, take the factory methods to get
-     * one.
-     * 
+     * If you want some implementation you can use, take the factory
+     * methods to get one.
      * 
      * @author Lena Brueder
      * @date 2012-05-21
