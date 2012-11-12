@@ -334,7 +334,7 @@ namespace musicaccess
                 return framesRead;
             }
             else if (error == MPG123_NEED_MORE)
-            {   //okay, seems as if the decoding finished beforehand, but stopping here should be okay.
+            {   //okay, seems as if the stream is damaged, but stopping here should be okay.
                 return framesRead;
             }
             else
@@ -400,6 +400,10 @@ namespace musicaccess
             }
             else if (error == MPG123_OK)
             {   //okay, more bytes follow
+                return framesRead;
+            }
+            else if (error == MPG123_NEED_MORE)
+            {   //okay, seems as if the stream is damaged, but stopping here should be okay.
                 return framesRead;
             }
             else
