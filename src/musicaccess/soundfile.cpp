@@ -333,6 +333,10 @@ namespace musicaccess
             {   //okay, more bytes follow
                 return framesRead;
             }
+            else if (error == MPG123_NEED_MORE)
+            {   //okay, seems as if the decoding finished beforehand, but stopping here should be okay.
+                return framesRead;
+            }
             else
             {
                 std::cerr << "mpg123: error while reading at position " << position << ": " << error << ", \"" << mpg123_plain_strerror(error) << "\"" << std::endl;
