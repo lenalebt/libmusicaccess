@@ -337,6 +337,10 @@ namespace musicaccess
             {   //okay, seems as if the stream is damaged, but stopping here should be okay.
                 return framesRead;
             }
+            else if (error == MPG123_ERR)
+            {   //okay, seems as if the stream is severely damaged, but stopping here should be okay in many cases.
+                return framesRead;
+            }
             else
             {
                 std::cerr << "mpg123: error while reading at position " << position << ": " << error << ", \"" << mpg123_plain_strerror(error) << "\"" << std::endl;
@@ -404,6 +408,10 @@ namespace musicaccess
             }
             else if (error == MPG123_NEED_MORE)
             {   //okay, seems as if the stream is damaged, but stopping here should be okay.
+                return framesRead;
+            }
+            else if (error == MPG123_ERR)
+            {   //okay, seems as if the stream is severely damaged, but stopping here should be okay in many cases.
                 return framesRead;
             }
             else
