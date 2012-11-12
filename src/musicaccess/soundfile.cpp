@@ -470,7 +470,7 @@ namespace musicaccess
     }
     SoundFile::SingletonInitializer::~SingletonInitializer()
     {
-        
+        std::cerr << "destroy" << std::endl;
     }
     
     SoundFileMetadata* SoundFile::getMetadata()
