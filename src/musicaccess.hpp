@@ -35,7 +35,7 @@
  * type
  * 
  * @code{.sh}
- * cmake -DCMAKE_BUILD_TYPE=Release -DUSE_GPL_SRC ..
+ * cmake -DCMAKE_BUILD_TYPE=Release -DUSE_GPL_SRC=1 ..
  * make -j5
  * make install
  * @endcode
