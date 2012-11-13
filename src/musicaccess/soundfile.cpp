@@ -452,8 +452,6 @@ namespace musicaccess
             mpg123_init();
             if(mpg123_init() != MPG123_OK)
                 std::cerr << "mpg123: basic setup impossible." << std::endl;
-            
-            //TODO: init sndfile
         }
         instance->counter++;
     }
@@ -463,14 +461,11 @@ namespace musicaccess
         if (instance->counter <= 0)
         {
             instance->counter = 0;
-            
-            mpg123_exit();
-            //TODO: destroy sndfile
         }
     }
     SoundFile::SingletonInitializer::~SingletonInitializer()
     {
-        std::cerr << "destroy" << std::endl;
+        mpg123_exit();
     }
     
     SoundFileMetadata* SoundFile::getMetadata()
