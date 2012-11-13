@@ -5,7 +5,7 @@ namespace tests
 {
     std::string basename(std::string filename)
     {
-        size_t pos = filename.find_last_of("/\\:");
+        std::size_t pos = filename.find_last_of("/\\:");
         pos = (pos!=std::string::npos) ? pos+1 : 0;
         return filename.substr(pos, filename.length() - pos - (filename.find_last_of("\"") != std::string::npos));
     }

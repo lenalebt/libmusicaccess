@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
     std::string testname(argv[1]);
-    std::transform(testname.begin(), testname.end(), testname.begin(), ::tolower);
+    std::transform(testname.begin(), testname.end(), testname.begin(), (int(*)(int))std::tolower);
     
     std::cout << "running test \"" << testname << "\"..." << std::flush << std::endl;
     if (testname == "basename")

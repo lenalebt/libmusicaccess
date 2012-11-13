@@ -505,12 +505,12 @@ namespace musicaccess
         //copy data to pair array
         for (int i=0; i<A; i++)
         {
-            coefficientsA[i].first = fabs(a[i]);
+            coefficientsA[i].first = std::fabs(a[i]);
             coefficientsA[i].second = i;
         }
         for (int i=0; i<B; i++)
         {
-            coefficientsB[i].first = fabs(b[i]);
+            coefficientsB[i].first = std::fabs(b[i]);
             coefficientsB[i].second = i;
         }
         
@@ -532,8 +532,8 @@ namespace musicaccess
     SortingIIRFilter* SortingIIRFilter::createFilter(const IIRFilter& filter)
     {
         SortingIIRFilter* sortFilter = new SortingIIRFilter();
-        memcpy(sortFilter->a, filter.a, MUSICACCESS_IIRFILTER_COEFFICIENTCOUNT*sizeof(iirfilter_coefficienttype));
-        memcpy(sortFilter->b, filter.b, MUSICACCESS_IIRFILTER_COEFFICIENTCOUNT*sizeof(iirfilter_coefficienttype));
+        std::memcpy(sortFilter->a, filter.a, MUSICACCESS_IIRFILTER_COEFFICIENTCOUNT*sizeof(iirfilter_coefficienttype));
+        std::memcpy(sortFilter->b, filter.b, MUSICACCESS_IIRFILTER_COEFFICIENTCOUNT*sizeof(iirfilter_coefficienttype));
         sortFilter->A = filter.A;
         sortFilter->B = filter.B;
         

@@ -41,7 +41,7 @@ namespace tests
         CHECK(file.isFileOpen());
         CHECK_EQ(file.getPosition(), 0u);
         CHECK_EQ(file.getChannelCount(), 2);
-        CHECK_EQ(file.getSampleCount(), 1424384);
+        CHECK_EQ(file.getSampleCount(), 1424384u);
         CHECK_EQ(file.getSampleSize(), 2);
         CHECK_EQ(file.getSampleRate(), 44100);
         int16_t* buffer = NULL;
@@ -63,7 +63,7 @@ namespace tests
         CHECK(file.isFileOpen());
         CHECK_EQ(file.getPosition(), 0u);
         CHECK_EQ(file.getChannelCount(), 2);
-        CHECK_EQ(file.getSampleCount(), 1424384);
+        CHECK_EQ(file.getSampleCount(), 1424384u);
         CHECK_EQ(file.getSampleSize(), 4);
         CHECK_EQ(file.getSampleRate(), 44100);
         float* floatBuffer = NULL;
@@ -103,7 +103,7 @@ namespace tests
         CHECK(file.isFileOpen());
         CHECK_EQ(file.getPosition(), 0u);
         CHECK_EQ(file.getChannelCount(), 2);
-        CHECK_EQ(file.getSampleCount(), 1424384);
+        CHECK_EQ(file.getSampleCount(), 1424384u);
         CHECK_EQ(file.getSampleSize(), 2);
         CHECK_EQ(file.getSampleRate(), 44100);
         CHECK_EQ(file.readSamples(buffer, 500u), 500u);
@@ -120,7 +120,7 @@ namespace tests
         CHECK(file.isFileOpen());
         CHECK_EQ(file.getPosition(), 0u);
         CHECK_EQ(file.getChannelCount(), 2);
-        CHECK_EQ(file.getSampleCount(), 1424384);
+        CHECK_EQ(file.getSampleCount(), 1424384u);
         CHECK_EQ(file.getSampleSize(), 4);
         CHECK_EQ(file.getSampleRate(), 44100);
         CHECK_EQ(file.readSamples(floatBuffer, 500u), 500u);
@@ -137,7 +137,7 @@ namespace tests
         CHECK(file.isFileOpen());
         CHECK_EQ(file.getPosition(), 0u);
         CHECK_EQ(file.getChannelCount(), 2);
-        CHECK_EQ(file.getSampleCount(), 1424384);
+        CHECK_EQ(file.getSampleCount(), 1424384u);
         CHECK_EQ(file.getSampleSize(), 2);
         CHECK_EQ(file.getSampleRate(), 44100);
         CHECK_EQ(file.readSamples(buffer, 500u), 500u);
@@ -160,7 +160,7 @@ namespace tests
         CHECK(file.isFileOpen());
         CHECK_EQ(file.getPosition(), 0u);
         CHECK_EQ(file.getChannelCount(), 2);
-        CHECK_EQ(file.getSampleCount(), 1424384);
+        CHECK_EQ(file.getSampleCount(), 1424384u);
         CHECK_EQ(file.getSampleSize(), 2);
         CHECK_EQ(file.getSampleRate(), 44100);
         CHECK_EQ(file.readSamples(buffer, 500u), 500u);
@@ -433,7 +433,7 @@ namespace tests
         file.readSamples(buffer, file.getSampleCount());
         
         std::cerr << "converting file to mono..." << std::endl;
-        for(int i=0; i< file.getSampleCount(); i+=2)
+        for(unsigned long i=0; i< file.getSampleCount(); i+=2)
         {
             buffer2[i/2] = (int32_t(buffer[i]) + int32_t(buffer[i+1])) / 2;
         }
@@ -441,7 +441,7 @@ namespace tests
         buffer = NULL;
         buffer = new int16_t[monoSampleCount];
         CHECK(buffer != NULL);
-        memcpy(buffer, buffer2, monoSampleCount*sizeof(int16_t));
+        std::memcpy(buffer, buffer2, monoSampleCount*sizeof(int16_t));
         bool arraysAreEqual=true;
         CHECK(buffer != buffer2);
         
@@ -517,7 +517,7 @@ namespace tests
             monoSampleCount = file.getSampleCount()/2;
             buffer2 = new int16_t[monoSampleCount];
             CHECK(buffer2 != NULL);
-            for(int i=0; i< file.getSampleCount(); i+=2)
+            for(unsigned long i=0; i< file.getSampleCount(); i+=2)
             {
                 buffer2[i/2] = (int32_t(buffer[i]) + int32_t(buffer[i+1])) / 2;
             }
@@ -525,7 +525,7 @@ namespace tests
             buffer = NULL;
             buffer = new int16_t[monoSampleCount];
             CHECK(buffer != NULL);
-            memcpy(buffer, buffer2, monoSampleCount*sizeof(int16_t));
+            std::memcpy(buffer, buffer2, monoSampleCount*sizeof(int16_t));
             arraysAreEqual=true;
             CHECK(buffer != buffer2);
         }
@@ -646,7 +646,7 @@ namespace tests
         file.readSamples(floatBuffer, file.getSampleCount());
         
         std::cerr << "converting file to mono..." << std::endl;
-        for(int i=0; i< file.getSampleCount(); i+=2)
+        for(unsigned long i=0; i< file.getSampleCount(); i+=2)
         {
             floatBuffer2[i/2] = (floatBuffer[i] + floatBuffer[i+1]) / 2.0;
         }
@@ -654,7 +654,7 @@ namespace tests
         floatBuffer = NULL;
         floatBuffer = new float[monoSampleCount];
         CHECK(floatBuffer != NULL);
-        memcpy(floatBuffer, floatBuffer2, monoSampleCount*sizeof(float));
+        std::memcpy(floatBuffer, floatBuffer2, monoSampleCount*sizeof(float));
         arraysAreEqual=true;
         CHECK(floatBuffer != floatBuffer2);
         
@@ -729,7 +729,7 @@ namespace tests
             monoSampleCount = file.getSampleCount()/2;
             floatBuffer2 = new float[monoSampleCount];
             CHECK(floatBuffer2 != NULL);
-            for(int i=0; i< file.getSampleCount(); i+=2)
+            for(unsigned long i=0; i< file.getSampleCount(); i+=2)
             {
                 floatBuffer2[i/2] = (floatBuffer[i] + floatBuffer[i+1]) / 2.0;
             }
@@ -737,7 +737,7 @@ namespace tests
             floatBuffer = NULL;
             floatBuffer = new float[monoSampleCount];
             CHECK(floatBuffer != NULL);
-            memcpy(floatBuffer, floatBuffer2, monoSampleCount*sizeof(float));
+            std::memcpy(floatBuffer, floatBuffer2, monoSampleCount*sizeof(float));
             arraysAreEqual=true;
             CHECK(floatBuffer != floatBuffer2);
         }
@@ -858,7 +858,7 @@ namespace tests
         file.readSamples(buffer, file.getSampleCount());
         
         std::cerr << "converting file to mono..." << std::endl;
-        for(int i=0; i< file.getSampleCount(); i+=2)
+        for(unsigned long i=0; i< file.getSampleCount(); i+=2)
         {
             buffer2[i/2] = (int32_t(buffer[i]) + int32_t(buffer[i+1])) / 2;
         }
@@ -866,7 +866,7 @@ namespace tests
         buffer = NULL;
         buffer = new int16_t[monoSampleCount];
         CHECK(buffer != NULL);
-        memcpy(buffer, buffer2, monoSampleCount*sizeof(int16_t));
+        std::memcpy(buffer, buffer2, monoSampleCount*sizeof(int16_t));
         bool arraysAreEqual=true;
         CHECK(buffer != buffer2);
         
@@ -954,7 +954,7 @@ namespace tests
             monoSampleCount = file.getSampleCount()/2;
             buffer2 = new int16_t[monoSampleCount];
             CHECK(buffer2 != NULL);
-            for(int i=0; i< file.getSampleCount(); i+=2)
+            for(unsigned long i=0; i< file.getSampleCount(); i+=2)
             {
                 buffer2[i/2] = (int32_t(buffer[i]) + int32_t(buffer[i+1])) / 2;
             }
@@ -962,7 +962,7 @@ namespace tests
             buffer = NULL;
             buffer = new int16_t[monoSampleCount];
             CHECK(buffer != NULL);
-            memcpy(buffer, buffer2, monoSampleCount*sizeof(int16_t));
+            std::memcpy(buffer, buffer2, monoSampleCount*sizeof(int16_t));
             arraysAreEqual=true;
             CHECK(buffer != buffer2);
         }

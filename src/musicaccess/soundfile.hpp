@@ -168,7 +168,7 @@ namespace musicaccess
          * @remarks If no file has been opened, the return value is undefined.
          * @return the sample count
          */
-        long getSampleCount() {return sampleCount;}
+        unsigned long getSampleCount() {return sampleCount;}
         
         /**
          * @brief Returns the size of a sample, in bytes.
