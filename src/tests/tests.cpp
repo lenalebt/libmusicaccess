@@ -184,8 +184,8 @@ namespace tests
         SoundFile file;
         file.open("./testdata/test.mp3");
         int16_t* buffer = NULL;
-        int sampleCount = file.getSampleCount();
-        int oldSampleCount = sampleCount;
+        unsigned int sampleCount = file.getSampleCount();
+        unsigned int oldSampleCount = sampleCount;
         buffer = new int16_t[sampleCount];
         CHECK(buffer != NULL);
         file.readSamples(buffer, sampleCount);
@@ -278,7 +278,7 @@ namespace tests
             soundfile.readSamples(buffer, soundfile.getSampleCount());
             
             std::cerr << "resampling..." << std::endl;
-            int sampleCount = soundfile.getSampleCount();
+            unsigned int sampleCount = soundfile.getSampleCount();
             resampler.resample(soundfile.getSampleRate(), &buffer, sampleCount, soundfile.getChannelCount());
             
             //TODO: Do some checks.
@@ -394,7 +394,7 @@ namespace tests
             soundfile.readSamples(floatBuffer, soundfile.getSampleCount());
             
             std::cerr << "resampling..." << std::endl;
-            int sampleCount = soundfile.getSampleCount();
+            unsigned int sampleCount = soundfile.getSampleCount();
             resampler.resample(soundfile.getSampleRate(), &floatBuffer, sampleCount, soundfile.getChannelCount());
             
             //TODO: Do some checks.
