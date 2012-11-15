@@ -18,7 +18,7 @@ Installing on a normal *nix system
 
 If you want to install the library in a normal, non-cross-compile-environment, just go to the "build/" directory and type
 
-cmake -DCMAKE_BUILD_TYPE=Release -DUSE_GPL_SRC ..
+cmake -DCMAKE_BUILD_TYPE=Release -DUSE_GPL_SRC=y ..
 make -j5
 make install
 If the code may not contain GPL code, type instead:
