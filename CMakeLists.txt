@@ -183,6 +183,7 @@ TARGET_LINK_LIBRARIES(musicaccess
     ${SNDFILE_LIBRARIES}
     ${MPG123_LIBRARIES}
     ${SRC_LIBRARIES}              #note: SRC will only be included if explicitly wanted on the command line.
+    m
     )
 SET_TARGET_PROPERTIES(musicaccess
     PROPERTIES COMPILE_FLAGS "-fPIC -shared"
@@ -239,6 +240,7 @@ TARGET_LINK_LIBRARIES(musicaccesstests
     ${SNDFILE_LIBRARIES}
     ${MPG123_LIBRARIES}
     ${SRC_LIBRARIES}              #note: SRC will only be included if explicitly wanted on the command line.
+    m
     )
 SET_TARGET_PROPERTIES(musicaccesstests
     PROPERTIES COMPILE_FLAGS "-fPIC -shared"
