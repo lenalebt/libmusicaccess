@@ -12,6 +12,8 @@
  * formats and presenting them in a standard format (22khz, mono, 16bit).
  * libmusicaccess allows opening/reading, filtering and resampling tasks.
  * 
+ * @tableofcontents
+ * 
  * @section mainpage_install Install
  * @subsection mainpage_install_prequisites Prequisites
  * To install the library, you need to install some other libraries and tools:
